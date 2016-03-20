@@ -4,10 +4,14 @@ import java.io.File;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -18,6 +22,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class Main extends JavaPlugin implements Listener{
 
 	public HashMap<Player, Player> duels = new HashMap<Player, Player>();
+	public static HashMap<Player, PlayerData> playerData = new HashMap<Player, PlayerData>();
 	
 	public String duelInviteMessage = "§e Has challenged you to a duel. Click to accept!";
 	
@@ -36,7 +41,56 @@ public class Main extends JavaPlugin implements Listener{
 	{
 		getLogger().info("Disabling Sduels");		
 	}
+	
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event){
+		Player player = event.getPlayer();
+		PlayerData PD = this.getPlayerData(player);
+		Main.playerData.put(player, PD);	    
+	}
+	
+	public void onLogout(PlayerQuitEvent event)
+	{
+		Player player = event.getPlayer();		
+		this.savePlayerData(player);
+	}
+	
+	public PlayerData getPlayerData(OfflinePlayer objective)
+	{
+		if(objective == null)
+		{
+			this.getLogger().info("PlayerData returning for player  = null");
+			String nullpath = this.getDataFolder() + "/players/null.yml";
+			return new PlayerData(nullpath, null);
+		}
 		
+		if(playerData.containsKey(objective))
+		{
+			return playerData.get(objective);
+		}
+		
+		String path = this.getDataFolder() + "/players/" + objective.getUniqueId() + ".yml";
+		this.getLogger().info("PlayerData retrieved for player " + objective.getName());
+
+		return new PlayerData(path, objective);
+		
+	}
+	
+	public void savePlayerData(OfflinePlayer player)
+	{
+		PlayerData PD = playerData.get(player);
+		
+		if(PD.path.equals(this.getDataFolder() + "/MinrCheckpoint/players/thiswillneverbearealplayername.yml"))
+		{
+			System.out.println("PlayerData for " + player.getName() + " is null!");
+			return;
+		}
+		
+		this.getLogger().info("PlayerData saved on logout for player " + player.getName());
+		PD.save();
+		Main.playerData.remove(player);
+	}
+
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		  if(cmd.getName().equalsIgnoreCase("duel"))
 		  {

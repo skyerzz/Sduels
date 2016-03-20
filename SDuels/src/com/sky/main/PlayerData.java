@@ -1,31 +1,17 @@
 package com.sky.main;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.minr.achievements.Achievement;
-import org.minr.achievements.Achievements;
-import org.minr.checkpoint.Checkpoint;
-import org.minr.checkpoint.MapData;
 
 public class PlayerData
 {
 	public final String path;
 
+	public int wins = 0;
 
 	private YamlConfiguration yml, newyml = new YamlConfiguration();
 	
-	//private OfflinePlayer player;
 
 	public PlayerData(String path, OfflinePlayer player)
 	{
@@ -36,7 +22,7 @@ public class PlayerData
 		this.load();
 	}
 
-	// Functions
+	
 	public void load()
 	{
 		this.loadCommonData();
@@ -44,21 +30,24 @@ public class PlayerData
 
 	public void loadCommonData()
 	{
-		String temp = this.yml.getString("muted");
+		String temp = this.yml.getString("wins");
 		if(temp != null)
 		{
-			this.mutedDate = new Date(this.yml.getLong("muted"));
+			this.wins = this.yml.getInt("wins");
 		}
 
 	}
 
 	public void saveCommonData()
 	{
-
-		if(this.firstLogin != null)
-		{
-			this.newyml.set("firstlogin", this.firstLogin.getTime());
-		}
+		this.newyml.set("wins", this.wins);
 	}
+	
+	public void save()
+	{
+		this.saveCommonData();
+		FileManager.saveFile(this.path, this.newyml);
+	}
+
 
 }
