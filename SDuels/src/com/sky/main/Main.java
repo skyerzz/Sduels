@@ -1,12 +1,17 @@
 package com.sky.main;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,8 +26,12 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class Main extends JavaPlugin implements Listener{
 
+	public YamlConfiguration yml;
+	
 	public HashMap<Player, Player> duels = new HashMap<Player, Player>();
 	public static HashMap<Player, PlayerData> playerData = new HashMap<Player, PlayerData>();
+	public HashMap<Location, Location> arenas = new HashMap<Location, Location>();
+	public List<Location> occupiedArenas = new ArrayList<Location>();
 	
 	public String duelInviteMessage = "§e Has challenged you to a duel. Click to accept!";
 	
@@ -34,12 +43,70 @@ public class Main extends JavaPlugin implements Listener{
 	    if(!path.exists()){
 	    	path.mkdirs();
 	    }
+	    loadData();
 	}
 	
 	@Override	
 	public void onDisable() 
 	{
 		getLogger().info("Disabling Sduels");		
+	}
+	
+	public void loadData()
+	{
+		String path = this.getDataFolder() + "/config.yml";
+		File file = FileManager.getFile(path);
+		this.yml = YamlConfiguration.loadConfiguration(file);
+		loadArenas();
+	}
+	
+	public void loadArenas()
+	{
+		ConfigurationSection cs = yml.getConfigurationSection("arenas");
+		if(cs==null)
+		{
+			Bukkit.getLogger().warning("No arenas are found in the config!");
+			return;
+		}
+		for(String string: cs.getKeys(false))
+		{
+			Location loc1 = null, loc2 = null;
+			for(int i = 1; i < 3; i++)
+			{
+				String[] location = cs.getString(string + ".location" + i).split(",");
+				if(location == null)
+				{
+					break;
+				}
+				try
+				{
+					int x = Integer.parseInt(location[0]);
+					int y = Integer.parseInt(location[1]);
+					int z = Integer.parseInt(location[2]);
+					float yaw = new Float(location[3]);
+					float pitch = new Float(location[4]);
+					if(i==1)
+					{
+						loc1 = new Location(Bukkit.getWorld("world"), x, y, z, yaw, pitch);
+					}
+					else
+					{
+						loc2 = new Location(Bukkit.getWorld("world"), x, y, z, yaw, pitch);
+					}
+				}
+				catch(NumberFormatException e)
+				{
+					Bukkit.getLogger().severe("Strings for the arenas configuration are not filled out correctly. Error on " + string + ".location" + i);
+					continue;
+				}
+				
+			}
+			if(loc1==null || loc2==null)
+			{
+				continue;
+			}
+			arenas.put(loc1, loc2);
+		}
 	}
 	
 	@EventHandler
@@ -170,7 +237,7 @@ public class Main extends JavaPlugin implements Listener{
 	public void sendHelpMessage(Player player)
 	{
 		player.sendMessage("§7Help for SDuel");
-		player.sendMessage("TODO");
+		player.sendMessage("§e");
 	}
 	
 }
