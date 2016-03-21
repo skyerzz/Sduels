@@ -4,15 +4,18 @@
 #ONLY USE SPACES IN THIS FILE, NO TABS!
 
 helpmessage:
-  - &7Help for Sduels
-  - &cPut your help-message here.
-  - &cuse a - for each new line.
+  - "&7Help for Sduels"
+  - "&cPut your help-message here."
+  - "&cuse a - for each new line."
+
+duelinvitemessage: "&e<player> Has challenged you to a duel. Click to accept!"
+duelcancelledmessage: "&cNo available arenas, Duel is cancelled!"
 
 arenas:
    #examples, remove the # to use this, and replace the locations with correct coordinates.
    #0:
-   #  location1: x,y,z,yaw,pitch
-   #  location2: x,y,z,yaw,pitch
+   #  location1: x,y,z,yaw,pitch,worldname
+   #  location2: x,y,z,yaw,pitch,worldname
    #1:
-   #  location1: x,y,z,yaw,pitch
-   #  location2: x,y,z,yaw,pitch
+   #  location1: x,y,z,yaw,pitch,worldname
+   #  location2: x,y,z,yaw,pitch,worldname

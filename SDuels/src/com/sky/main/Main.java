@@ -1,7 +1,6 @@
 package com.sky.main;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,10 +31,10 @@ public class Main extends JavaPlugin implements Listener{
 	
 	public HashMap<Player, Player> duels = new HashMap<Player, Player>();
 	public static HashMap<Player, PlayerData> playerData = new HashMap<Player, PlayerData>();
-	public HashMap<Location, Location> arenas = new HashMap<Location, Location>();
-	public List<Location> occupiedArenas = new ArrayList<Location>();
+	public static HashMap<Location, Location> arenas = new HashMap<Location, Location>();
+	public static HashMap<Location, Location> occupiedArenas = new HashMap<Location, Location>();
 	
-	public String duelInviteMessage = "§e Has challenged you to a duel. Click to accept!";
+	public String duelInviteMessage = "§e<player> Has challenged you to a duel. Click to accept!";
 	public String[] helpmessage;
 	
 	@Override
@@ -50,6 +49,7 @@ public class Main extends JavaPlugin implements Listener{
 	    {
 	    	Main.playerData.put(player, this.getPlayerData(player));
 	    }
+	    
 	    reload();
 	}
 	
@@ -61,8 +61,14 @@ public class Main extends JavaPlugin implements Listener{
 	
 	public void reload()
 	{
-		String path = this.getDataFolder() + "/config.yml";
-		File file = FileManager.getFile(path);
+		String path = this.getDataFolder() + "/config.yml";	    
+		File file = new File(path);
+	    if (!file.exists()) {
+	        getLogger().info("config.yml not found, creating!");
+	        saveDefaultConfig();
+	    } else {
+	        getLogger().info("config.yml found, loading!");
+	    }
 		this.yml = YamlConfiguration.loadConfiguration(file);
 		
 		loadArenas();		
@@ -126,8 +132,22 @@ public class Main extends JavaPlugin implements Listener{
 		int i = 0;
 		for(String string: helpmessage)
 		{
+			System.out.println(string);
 			this.helpmessage[i] = string.replace("&", "§");
+			System.out.println(this.helpmessage[i]);
 			i++;
+		}
+		
+		String temp = yml.getString("duelinvitemessage");
+		if(temp!=null)
+		{
+			this.duelInviteMessage = temp.replace("&", "§");
+		}
+		
+		temp = yml.getString("duelcancelledmessage");
+		if(temp!=null)
+		{
+			this.battle.cancelled = temp.replace("&", "§");
 		}
 		
 	}
@@ -249,7 +269,7 @@ public class Main extends JavaPlugin implements Listener{
 				  duels.put(p2, player);
 				  
 				  //message player 2 that someone challenged them.
-			  	  TextComponent textDuel = new TextComponent("§e" + player.getName() + duelInviteMessage);
+			  	  TextComponent textDuel = new TextComponent(this.duelInviteMessage.replace("<player>", player.getName()));
 				  textDuel.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,  new ComponentBuilder("§eClick to accept the duel.").create() ));
 				  textDuel.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/duel accept " + player.getName()));
 				  player.spigot().sendMessage(textDuel);
