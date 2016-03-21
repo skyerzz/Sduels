@@ -26,6 +26,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class Main extends JavaPlugin implements Listener{
 
+	Battle battle = new Battle(this);
+	
 	public YamlConfiguration yml;
 	
 	public HashMap<Player, Player> duels = new HashMap<Player, Player>();
@@ -34,6 +36,7 @@ public class Main extends JavaPlugin implements Listener{
 	public List<Location> occupiedArenas = new ArrayList<Location>();
 	
 	public String duelInviteMessage = "§e Has challenged you to a duel. Click to accept!";
+	public String[] helpmessage;
 	
 	@Override
 	public void onEnable() 
@@ -43,7 +46,11 @@ public class Main extends JavaPlugin implements Listener{
 	    if(!path.exists()){
 	    	path.mkdirs();
 	    }
-	    loadData();
+	    for(Player player: Bukkit.getOnlinePlayers())
+	    {
+	    	Main.playerData.put(player, this.getPlayerData(player));
+	    }
+	    reload();
 	}
 	
 	@Override	
@@ -52,12 +59,14 @@ public class Main extends JavaPlugin implements Listener{
 		getLogger().info("Disabling Sduels");		
 	}
 	
-	public void loadData()
+	public void reload()
 	{
 		String path = this.getDataFolder() + "/config.yml";
 		File file = FileManager.getFile(path);
 		this.yml = YamlConfiguration.loadConfiguration(file);
-		loadArenas();
+		
+		loadArenas();		
+		loadMessages();
 	}
 	
 	public void loadArenas()
@@ -107,6 +116,20 @@ public class Main extends JavaPlugin implements Listener{
 			}
 			arenas.put(loc1, loc2);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void loadMessages()
+	{
+		List<String> helpmessage = (List<String>) yml.getList("helpmessage");
+		this.helpmessage = new String[helpmessage.size()];
+		int i = 0;
+		for(String string: helpmessage)
+		{
+			this.helpmessage[i] = string.replace("&", "§");
+			i++;
+		}
+		
 	}
 	
 	@EventHandler
@@ -199,8 +222,10 @@ public class Main extends JavaPlugin implements Listener{
 					  Player check = duels.get(player);
 					  if(check == p2)
 					  {
+						  duels.remove(player);
+
 						  //the numbers match up, lets battle!
-						  //TODO: initiate battle
+						  battle.startBattle(player, p2);
 					  }
 				  }
 			  }			  
@@ -236,8 +261,10 @@ public class Main extends JavaPlugin implements Listener{
 	
 	public void sendHelpMessage(Player player)
 	{
-		player.sendMessage("§7Help for SDuel");
-		player.sendMessage("§e");
+		for(String string: this.helpmessage)
+		{
+			player.sendMessage(string);
+		}
 	}
 	
 }

@@ -2,11 +2,11 @@
 #
 #IF YOU CHANGE ANYTHING IN THIS FILE, USE /sduel reload INGAME!
 #ONLY USE SPACES IN THIS FILE, NO TABS!
-#
-#The prefix for the plugin. Leave empty for no prefix.
-#For color codes, use "&" and then the color code (1-f)
-#Enclose your prefix between ' ' (such as 'PREFIX')
-prefix: '&0[&9SkyWars&0]'
+
+helpmessage:
+  - &7Help for Sduels
+  - &cPut your help-message here.
+  - &cuse a - for each new line.
 
 arenas:
    #examples, remove the # to use this, and replace the locations with correct coordinates.
