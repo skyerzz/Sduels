@@ -102,6 +102,10 @@ public class Battle implements Listener{
 	@EventHandler
 	public void onTeleport(PlayerTeleportEvent event)
 	{
+		if(!this.ingame.contains(event.getPlayer()))
+		{
+			return;
+		}
 		double distance = event.getFrom().distance(event.getTo());
 		System.out.println("" + distance);
 		if(distance < 10)
@@ -149,6 +153,10 @@ public class Battle implements Listener{
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event)
 	{
+		if(!this.choosing.contains((Player) event.getWhoClicked()))
+		{
+			return;
+		}
 		if(event.getCurrentItem()==null)
 		{
 			return;
@@ -331,7 +339,7 @@ public class Battle implements Listener{
 	{
 		Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
 		final Objective o = board.registerNewObjective(scoreboardName, "dummy");
-	    o.setDisplaySlot(DisplaySlot.SIDEBAR);
+	    o.setDisplaySlot(DisplaySlot.SIDEBAR);	    
 	    
 	    //empty line
 	    Score s1 = o.getScore("");
@@ -339,6 +347,10 @@ public class Battle implements Listener{
 	    
 	    //set player + chosen kit
 	    String kit = this.kits.get(player);
+	    if(kit==null)
+	    {
+	    	kit = "null";
+	    }
 	    String kitname = "NULL";
 	    switch(kit)
 	    {
@@ -351,6 +363,9 @@ public class Battle implements Listener{
 	    case "mcsg":
 	    	kitname = inv.mcsgName;
 	    	break;
+    	default:
+    		kitname = "Choosing...";
+    		break;
 	    }
 	    Score s2 = o.getScore(player.getName() + "§67: " + kitname);
 	    s2.setScore(2);
@@ -358,6 +373,10 @@ public class Battle implements Listener{
 	    //get the kit from the opponent next.
 	    Player opponent = this.duels.get(player);	    
 	    String kit2 = this.kits.get(opponent);
+	    if(kit2==null)
+	    {
+	    	kit2 = "null";
+	    }
 	    String kitname2 = "NULL";
 	    switch(kit2)
 	    {
@@ -370,6 +389,9 @@ public class Battle implements Listener{
 	    case "mcsg":
 	    	kitname2 = inv.mcsgName;
 	    	break;
+    	default:
+    		kitname = "Choosing...";
+    		break;
 	    }
 	    Score s3 = o.getScore(opponent.getName() + "§67: " + kitname2);
 	    s3.setScore(1);

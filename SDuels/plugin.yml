@@ -10,5 +10,7 @@ commands:
     description: Standard command for Duel
     
 permissions:    
-    duel.duel
+    duel.duel:
+        default: op
+    duel.viewstats:
         default: op

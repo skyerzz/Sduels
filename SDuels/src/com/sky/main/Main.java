@@ -38,6 +38,7 @@ public class Main extends JavaPlugin implements Listener{
 	public String alreadyInGame = "§eOne of the players is already in a duel!";
 	public String duelhovermessage = "§eClick to accept the duel!";
 	public String noperms = "§cYou do not have permissions for this!";
+	
 	public String[] helpmessage;
 	public static String maindatafolder;
 	
@@ -230,13 +231,42 @@ public class Main extends JavaPlugin implements Listener{
 				  return true;
 			  }
 			  
-			  if(args[0].equalsIgnoreCase("testinv"))
+			  if(args[0].equalsIgnoreCase("help"))
 			  {
-				  this.battle.inv.showMenu(player);
+				  sendHelpMessage(player);
+				  return true;
+			  }
+			  else if(args[0].equalsIgnoreCase("version"))
+			  {
+				  player.sendMessage("§6Sduels version ");
+				  player.sendMessage("§6Author: skyerzz");
+				  //TODO: version here.
 				  return true;
 			  }
 			  
-			  if(args[0].equalsIgnoreCase("accept"))
+			  else if(args[0].equalsIgnoreCase("stats"))
+			  {
+				  if(!player.hasPermission("duel.viewstats"))
+				  {
+					  player.sendMessage(this.noperms);
+					  return true;
+				  }
+				  if(args.length < 2)
+				  {
+					  sendHelpMessage(player);
+					  return true;
+				  }
+				  @SuppressWarnings("deprecation")
+				OfflinePlayer objective = Bukkit.getOfflinePlayer(args[1]);
+				  if(objective==null)
+				  {
+					  player.sendMessage("§6Could not find that player in our system!");
+					  return true;
+				  }
+				  this.battle.inv.showStats(player, objective);
+			  }
+			  
+			  else if(args[0].equalsIgnoreCase("accept"))
 			  {
 				  //accept a duel.
 				  if(args.length < 2)
