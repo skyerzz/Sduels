@@ -10,9 +10,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -89,7 +91,27 @@ public class Battle implements Listener{
 		Player winner = this.duels.get(event.getPlayer());
 		this.win(winner);
 	}
-		
+	
+	@EventHandler
+	public void onPlayerLeave(PlayerQuitEvent event)
+	{
+		if(this.ingame.contains(event.getPlayer()))
+		{
+			Player winner = this.duels.get(event.getPlayer());
+			this.win(winner);			
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerDeath(PlayerDeathEvent event)
+	{
+		if(this.ingame.contains(event.getEntity()))
+		{
+			Player winner = this.duels.get(event.getEntity());
+			this.win(winner);			
+		}
+	}
+	
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event)
 	{
@@ -171,6 +193,8 @@ public class Battle implements Listener{
 	{
 		duels.put(challenger, defender);
 		duels.put(defender, challenger);
+		this.ingame.add(challenger);
+		this.ingame.add(defender);
 		
 		Location loc = this.getArena();
 		if(loc==null)
@@ -178,13 +202,21 @@ public class Battle implements Listener{
 			//no available arenas are found, we cancel the match
 			duels.remove(challenger);
 			duels.remove(defender);
+			this.ingame.remove(challenger);
+			this.ingame.remove(defender);
 			challenger.sendMessage(cancelled);
 			defender.sendMessage(cancelled);
 			return;
 		}
+		Location loc2 = Main.arenas.get(loc);
+		
 		//make sure that this arena cannot be used by other people
 		Main.occupiedArenas.put(loc, Main.arenas.get(loc));
 		Main.arenas.remove(loc);
+		
+		//teleport the players to said arena
+		challenger.teleport(loc);
+		defender.teleport(loc2);
 		
 		//make both players choose their kit
 		choosing.add(challenger);
@@ -225,6 +257,8 @@ public class Battle implements Listener{
 	public void win(Player player)
 	{
 		Player loser = this.duels.get(player);
+		
+		//give the winner some stats
 		PlayerData pPD = Main.getPlayerData(player);
 		pPD.wins++;
 		switch(kits.get(player))
@@ -238,9 +272,13 @@ public class Battle implements Listener{
 		case "mcsg":
 			pPD.kitWinMCSG++;
 			break;
-		default: break;
+		default: 
+			break;
 		}
+		pPD.addPreviousDuel(loser.getUniqueId().toString(), 1);
+		pPD.addPreviousDuelWin(loser.getUniqueId().toString(), 1);
 		
+		//give the loser some stats
 		PlayerData lPD = Main.getPlayerData(loser);
 		lPD.losses++;
 		switch(kits.get(player))
@@ -256,9 +294,15 @@ public class Battle implements Listener{
 			break;
 		default: break;
 		}
+		lPD.addPreviousDuel(player.getUniqueId().toString(), 1);
 		
+		//remove both players from all data stored again
 		this.duels.remove(player);
 		this.duels.remove(loser);
+		this.kits.remove(player);
+		this.kits.remove(loser);
+		this.ingame.remove(player);
+		this.ingame.remove(player);
 	}
 	
 	public Location getArena()

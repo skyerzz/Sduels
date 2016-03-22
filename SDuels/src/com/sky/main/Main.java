@@ -35,6 +35,7 @@ public class Main extends JavaPlugin implements Listener{
 	public static HashMap<Location, Location> occupiedArenas = new HashMap<Location, Location>();
 	
 	public String duelInviteMessage = "§e<player> Has challenged you to a duel. Click to accept!";
+	public String alreadyInGame = "§eOne of the players is already in a duel!";
 	public String[] helpmessage;
 	public static String maindatafolder;
 	
@@ -145,6 +146,12 @@ public class Main extends JavaPlugin implements Listener{
 			this.duelInviteMessage = temp.replace("&", "§");
 		}
 		
+		temp = yml.getString("alreadyingamemessage");
+		if(temp!=null)
+		{
+			this.alreadyInGame = temp.replace("&", "§");
+		}
+		
 	}
 	
 	@EventHandler
@@ -244,7 +251,14 @@ public class Main extends JavaPlugin implements Listener{
 					  if(check == p2)
 					  {
 						  duels.remove(player);
-
+						  
+						  //lets make sure none of these players are actually ingame.						  
+						  if(this.battle.ingame.contains(player) || this.battle.ingame.contains(p2))
+						  {
+							  player.sendMessage(alreadyInGame);
+							  p2.sendMessage(alreadyInGame);
+							  return true;
+						  }
 						  //the numbers match up, lets battle!
 						  battle.startBattle(player, p2);
 					  }
@@ -264,6 +278,14 @@ public class Main extends JavaPlugin implements Listener{
 				  {
 					  player.sendMessage("§6" + args[0] + " §cis not online!");
 					  return true;					  
+				  }
+				  
+				  //if one of these players is already in game, stop it!
+				  if(this.battle.ingame.contains(player) || this.battle.ingame.contains(p2))
+				  {
+					  player.sendMessage(alreadyInGame);
+					  p2.sendMessage(alreadyInGame);
+					  return true;
 				  }
 				  
 				  //put p2-player pair in the hashmap, so we can accept it easily. this will put in (challenged, challenger).

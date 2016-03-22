@@ -16,6 +16,9 @@ duelinvitemessage: "&e<player> Has challenged you to a duel. Click to accept!"
 #if the duel gets cancelled, this message will be send to both players
 duelcancelledmessage: "&cNo available arenas, Duel is cancelled!"
 
+#if one of the players is already in game, this message in sent
+alreadyingamemessage = "&eOne of the players is already in a duel!"
+
 #The countdown for the battle. <seconds> gets replaced with the current seconds till the match begins.
 countdownmessage: "&6The match begins in <seconds> seconds!"
 
