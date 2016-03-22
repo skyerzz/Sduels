@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class PlayerData
@@ -13,6 +14,7 @@ public class PlayerData
 	public int wins = 0, losses = 0;
 	public int kitLossPotion = 0, kitLossGapple = 0, kitLossMCSG = 0;
 	public int kitWinPotion = 0, kitWinGapple = 0, kitWinMCSG = 0;
+	public boolean exists = false;
 
 	public HashMap<String, Integer> previousDuels = new HashMap<String, Integer>();
 	public HashMap<String, Integer> previousDuelWins = new HashMap<String, Integer>();
@@ -63,7 +65,12 @@ public class PlayerData
 	
 	public void loadPreviousDuels()
 	{
-		for(String string: this.yml.getConfigurationSection("previousduels").getKeys(false))
+		ConfigurationSection cs = this.yml.getConfigurationSection("previousduels");
+		if(cs==null)
+		{
+			return;
+		}
+		for(String string: cs.getKeys(false))
 		{
 			String[] battles = this.yml.getString("previousduels." + string).split(":");
 			try
@@ -129,6 +136,12 @@ public class PlayerData
 		{
 			this.kitLossMCSG = this.yml.getInt("kitwloss.mcsg");
 		}
+		
+		temp = this.yml.getString("exists");
+		if(temp!=null)
+		{
+			this.exists = true;
+		}
 
 	}
 
@@ -136,6 +149,7 @@ public class PlayerData
 	{
 		this.newyml.set("wins", this.wins);
 		this.newyml.set("losses", this.losses);
+		this.newyml.set("exists", true);
 		
 		this.newyml.set("kitwins.potion", this.kitWinPotion);
 		this.newyml.set("kitwins.gapple", this.kitWinGapple);

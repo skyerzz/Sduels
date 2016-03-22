@@ -21,7 +21,7 @@ duelinvitehover: "&eClick to accept the duel!"
 duelcancelledmessage: "&cNo available arenas, Duel is cancelled!"
 
 #if one of the players is already in game, this message in sent
-alreadyingamemessage = "&eOne of the players is already in a duel!"
+alreadyingamemessage: "&eOne of the players is already in a duel!"
 
 #The countdown for the battle. <seconds> gets replaced with the current seconds till the match begins.
 countdownmessage: "&6The match begins in <seconds> seconds!"
@@ -38,7 +38,11 @@ scoreboardname: "&4Duel"
 #this will appear at the bottom of the scoreboard
 bottomscoreboard: "&6I cannot remember the server IP"
 
+#if a player does not exist in our database, this is shown as message (in case of stats call)
+playernonexistant: "&cThis player does not appear in our database!"
 
+#if a player tries to battle themselfs, this shows
+battleself: "&cYou cannot battle yourself!"
 
 #GUI texts
 menuname: "&9Kit Menu"
@@ -61,6 +65,11 @@ mcsglore:
   - ""
   - "&cUse Empty lines for an empty space in the lore."
 
+
+#end of messages
+
+#location to teleport both players to after battle
+afterbattlelocation: x,y,z,yaw,pitch,world
 
 #arenas locations
 arenas:

@@ -38,6 +38,7 @@ public class Main extends JavaPlugin implements Listener{
 	public String alreadyInGame = "§eOne of the players is already in a duel!";
 	public String duelhovermessage = "§eClick to accept the duel!";
 	public String noperms = "§cYou do not have permissions for this!";
+	public String battleself = "§cYou cannot battle yourself!";
 	
 	public String[] helpmessage;
 	public static String maindatafolder;
@@ -161,6 +162,12 @@ public class Main extends JavaPlugin implements Listener{
 			this.noperms = temp.replace("&", "§");
 		}
 		
+		temp = yml.getString("battleself");
+		if(temp!=null)
+		{
+			this.battleself = temp.replace("&", "§");
+		}
+		
 	}
 	
 	@EventHandler
@@ -243,6 +250,17 @@ public class Main extends JavaPlugin implements Listener{
 				  //TODO: version here.
 				  return true;
 			  }
+			  else if(args[0].equalsIgnoreCase("reload"))
+			  {
+				  if(!player.hasPermission("duel.reload"))
+				  {
+					  player.sendMessage(this.noperms);
+					  return true;
+				  }
+				  this.reload();
+				  player.sendMessage("Reloaded Sduel!");
+				  return true;
+			  }
 			  
 			  else if(args[0].equalsIgnoreCase("stats"))
 			  {
@@ -309,7 +327,7 @@ public class Main extends JavaPlugin implements Listener{
 			  }			  
 			  else
 			  {
-				  //args[0] was not accept, so we assume its a player.
+				  //args[0] was not any of the above, so we assume its a player.
 				  Player p2 = Bukkit.getPlayer(args[0]);
 				  //check if player2 is actually online and exists.
 				  if(p2 == null)
@@ -321,6 +339,13 @@ public class Main extends JavaPlugin implements Listener{
 				  {
 					  player.sendMessage("§6" + args[0] + " §cis not online!");
 					  return true;					  
+				  }
+				  
+				  if(p2==player)
+				  {
+					  //you sly dog, you cant battle yourself!
+					  player.sendMessage(this.battleself);
+					  return true;
 				  }
 				  
 				  //if one of these players is already in game, stop it!

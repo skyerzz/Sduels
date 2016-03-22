@@ -14,3 +14,5 @@ permissions:
         default: op
     duel.viewstats:
         default: op
+    duel.reload:
+        default: op

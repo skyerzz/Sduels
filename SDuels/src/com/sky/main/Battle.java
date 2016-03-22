@@ -34,6 +34,7 @@ public class Battle implements Listener{
 		this.main = main;
 		inv = new Inventories(this.main);
 		loadStrings(main.yml);
+		loadOthers(main.yml);
 	}
 	
 	public void loadStrings(YamlConfiguration yml)
@@ -75,6 +76,31 @@ public class Battle implements Listener{
 		}
 	}
 	
+	public void loadOthers(YamlConfiguration yml)
+	{
+		String temp = yml.getString("afterbattlelocation");
+		if(temp==null)
+		{
+			main.getLogger().severe("afterbattlelocation is not correct in the config!");
+			return;
+		}
+		try
+		{
+			String[] sLoc = temp.split(",");
+			int x = Integer.parseInt(sLoc[0]);
+			int y = Integer.parseInt(sLoc[1]);
+			int z = Integer.parseInt(sLoc[2]);
+			float yaw = new Float(sLoc[3]);
+			float pitch = new Float(sLoc[4]);
+			String worldname = sLoc[5];
+			this.endbattle = new Location(Bukkit.getWorld(worldname), x, y, z ,yaw ,pitch);
+		}
+		catch(NumberFormatException | ArrayIndexOutOfBoundsException e)
+		{
+			main.getLogger().severe("afterbattlelocation is not correct in the config!");
+		}
+	}
+	
 	public String cancelled = "§cNo available arenas, Duel is cancelled!";
 	public String startbattle = "§6GO!";
 	public String countdownmessage = "§6The match begins in <seconds> seconds!";
@@ -88,6 +114,7 @@ public class Battle implements Listener{
 	public ArrayList<Player> ingame = new ArrayList<Player>();
 	public ArrayList<Player> freeze = new ArrayList<Player>();
 	public ArrayList<Player> choosing = new ArrayList<Player>();
+	public Location endbattle = new Location(Bukkit.getWorld("world"), 0, 0, 0);
 	
 	
 	@EventHandler
@@ -102,7 +129,7 @@ public class Battle implements Listener{
 	@EventHandler
 	public void onTeleport(PlayerTeleportEvent event)
 	{
-		if(!this.ingame.contains(event.getPlayer()))
+		if(!this.duels.containsKey(event.getPlayer()))
 		{
 			return;
 		}
@@ -119,7 +146,7 @@ public class Battle implements Listener{
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent event)
 	{
-		if(this.ingame.contains(event.getPlayer()))
+		if(this.duels.containsKey(event.getPlayer()))
 		{
 			Player winner = this.duels.get(event.getPlayer());
 			this.win(winner);			
@@ -129,7 +156,7 @@ public class Battle implements Listener{
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event)
 	{
-		if(this.ingame.contains(event.getEntity()))
+		if(this.duels.containsKey(event.getEntity()))
 		{
 			Player winner = this.duels.get(event.getEntity());
 			this.win(winner);			
@@ -221,8 +248,6 @@ public class Battle implements Listener{
 	{
 		duels.put(challenger, defender);
 		duels.put(defender, challenger);
-		this.ingame.add(challenger);
-		this.ingame.add(defender);
 		
 		Location loc = this.getArena();
 		if(loc==null)
@@ -230,8 +255,6 @@ public class Battle implements Listener{
 			//no available arenas are found, we cancel the match
 			duels.remove(challenger);
 			duels.remove(defender);
-			this.ingame.remove(challenger);
-			this.ingame.remove(defender);
 			challenger.sendMessage(cancelled);
 			defender.sendMessage(cancelled);
 			return;
@@ -258,6 +281,12 @@ public class Battle implements Listener{
 	
 	public void countDown(Player player, Player opponent)
 	{		
+		this.ingame.add(player);
+		this.ingame.add(opponent);
+		this.updateScoreBoard(player);
+		this.updateScoreBoard(opponent);
+		
+		//countdown from 5.
 		new BukkitRunnable() 
 		{
 			int i = 0;
@@ -287,6 +316,16 @@ public class Battle implements Listener{
 	public void win(Player player)
 	{
 		Player loser = this.duels.get(player);
+		if(!this.ingame.contains(player))
+		{
+			player.sendMessage(this.cancelled);
+			loser.sendMessage(this.cancelled);
+			this.duels.remove(player);
+			this.duels.remove(loser);
+			this.kits.remove(player);
+			this.kits.remove(loser);
+			return;
+		}
 		
 		//give the winner some stats
 		PlayerData pPD = Main.getPlayerData(player);
@@ -326,13 +365,16 @@ public class Battle implements Listener{
 		}
 		lPD.addPreviousDuel(player.getUniqueId().toString(), 1);
 		
-		//remove both players from all data stored again
+		//remove both players from all data stored again and teleport them to specified location in config.
 		this.duels.remove(player);
 		this.duels.remove(loser);
 		this.kits.remove(player);
 		this.kits.remove(loser);
 		this.ingame.remove(player);
 		this.ingame.remove(loser);
+		
+		player.teleport(this.endbattle);
+		loser.teleport(this.endbattle);
 	}
 	
 	public void updateScoreBoard(Player player)
@@ -402,6 +444,7 @@ public class Battle implements Listener{
 	    
 		player.setScoreboard(board);
 	}
+	
 	
 	public Location getArena()
 	{

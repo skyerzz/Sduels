@@ -24,6 +24,7 @@ public class Inventories{
 	}
 
 	String menuname = "§9Kit Menu";
+	String playernull = "§cThis player does not appear in our database!";
 	
 	String potionName = "§6Potion PvP", gappleName = "§6Gapple PvP", mcsgName = "§6MCSG";
 	ArrayList<String> potionlore = new ArrayList<String>(), gapplelore = new ArrayList<String>(), mcsglore = new ArrayList<String>();
@@ -68,7 +69,13 @@ public class Inventories{
 			this.mcsgName = temp.replace("&", "§");
 		}
 		
-		;
+		temp = yml.getString("playernonexsistant");
+		if(temp!=null)
+		{
+			this.playernull = temp.replace("&", "§");
+		}
+		
+		
 		for(String string: (List<String>) yml.getList("mcsglore"))
 		{
 			this.mcsglore.add(string.replace("&", "§"));
@@ -117,7 +124,12 @@ public class Inventories{
 	public void showStats(Player sender, OfflinePlayer player)
 	{
 		PlayerData PD = Main.getPlayerData(player);
-		Inventory menu = Bukkit.createInventory(null, 54, menuname);
+		if(!PD.exists)
+		{
+			sender.sendMessage(this.playernull);
+			return;
+		}
+		Inventory menu = Bukkit.createInventory(null, 27, menuname);
 
 		ItemStack wins = new ItemStack(Material.GOLD_BLOCK, 1);
 		{
@@ -144,9 +156,20 @@ public class Inventories{
 			list.add("");
 			list.add("§7Kit Uses: " + (PD.kitLossPotion + PD.kitWinPotion));
 			list.add("§6Kit Wins: " + PD.kitWinPotion);
-			list.add("§8Kit Losses: " + PD.kitLossPotion);
+			list.add("§7Kit Losses: " + PD.kitLossPotion);
 			list.add("");
-			list.add("§8Win percentage: " + (PD.kitWinPotion/PD.kitLossPotion)*100 + "%");
+			if(PD.kitLossPotion!=0)
+			{
+				list.add("§7Win percentage: " + (PD.kitWinPotion/PD.kitLossPotion)*100 + "%");
+			}
+			else if(PD.kitWinPotion!=0)
+			{
+				list.add("§7Win percentage: " + "100%");
+			}
+			else
+			{
+				list.add("§7Win percentage: " + "N/A");				
+			}
 			meta.setLore(list);
 			potionStat.setItemMeta(meta);
 			menu.setItem(20, potionStat);
@@ -160,9 +183,20 @@ public class Inventories{
 			list.add("");
 			list.add("§7Kit Uses: " + (PD.kitLossGapple + PD.kitWinGapple));
 			list.add("§6Kit Wins: " + PD.kitWinGapple);
-			list.add("§8Kit Losses: " + PD.kitLossGapple);
+			list.add("§7Kit Losses: " + PD.kitLossGapple);
 			list.add("");
-			list.add("§8Win percentage: " + (PD.kitWinGapple/PD.kitLossGapple)*100 + "%");
+			if(PD.kitLossGapple!=0)
+			{
+				list.add("§7Win percentage: " + (PD.kitWinGapple/PD.kitLossGapple)*100 + "%");
+			}
+			else if(PD.kitWinGapple!=0)
+			{
+				list.add("§7Win percentage: " + "100%");
+			}
+			else
+			{
+				list.add("§7Win percentage: " + "N/A");				
+			}
 			meta.setLore(list);
 			gappleStat.setItemMeta(meta);
 			menu.setItem(22, gappleStat);
@@ -176,9 +210,20 @@ public class Inventories{
 			list.add("");
 			list.add("§7Kit Uses: " + (PD.kitLossMCSG + PD.kitWinMCSG));
 			list.add("§6Kit Wins: " + PD.kitWinMCSG);
-			list.add("§8Kit Losses: " + PD.kitLossMCSG);
+			list.add("§7Kit Losses: " + PD.kitLossMCSG);
 			list.add("");
-			list.add("§8Win percentage: " + (PD.kitWinMCSG/PD.kitLossMCSG)*100 + "%");
+			if(PD.kitLossMCSG!=0)
+			{
+				list.add("§7Win percentage: " + (PD.kitWinMCSG/PD.kitLossMCSG)*100 + "%");
+			}
+			else if(PD.kitWinMCSG!=0)
+			{
+				list.add("§7Win percentage: " + "100%");
+			}
+			else
+			{
+				list.add("§7Win percentage: " + "N/A");				
+			}
 			meta.setLore(list);
 			mcsgStat.setItemMeta(meta);
 			menu.setItem(24, mcsgStat);
