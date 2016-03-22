@@ -15,13 +15,13 @@ public class PlayerData
 	public int kitWinPotion = 0, kitWinGapple = 0, kitWinMCSG = 0;
 
 	public HashMap<String, Integer> previousDuels = new HashMap<String, Integer>();
+	public HashMap<String, Integer> previousDuelWins = new HashMap<String, Integer>();
 	
 	private YamlConfiguration yml, newyml = new YamlConfiguration();
 	
 
 	public PlayerData(String path, OfflinePlayer player)
 	{
-	//	this.player = player;
 		this.path = path;
 		File file = FileManager.getFile(path);
 		this.yml = YamlConfiguration.loadConfiguration(file);
@@ -48,12 +48,35 @@ public class PlayerData
 		}
 	}
 
+	public void addPreviousDuelWin(String uuid, int amount)
+	{
+		if(!this.previousDuelWins.containsKey(uuid))
+		{
+			this.previousDuelWins.put(uuid, amount);
+		}
+		else
+		{
+			int prevamount = this.previousDuelWins.get(uuid);
+			this.previousDuelWins.replace(uuid, prevamount + amount);
+		}
+	}
+	
 	public void loadPreviousDuels()
 	{
 		for(String string: this.yml.getConfigurationSection("previousduels").getKeys(false))
 		{
-			int battles = this.yml.getInt("previousduels." + string);
-			this.addPreviousDuel(string, battles);
+			String[] battles = this.yml.getString("previousduels." + string).split(":");
+			try
+			{
+				int previousduels = Integer.parseInt(battles[0]);
+				this.addPreviousDuel(string, previousduels);
+				int previousWins = Integer.parseInt(battles[1]);
+				this.addPreviousDuelWin(string, previousWins);
+			}
+			catch(NumberFormatException | ArrayIndexOutOfBoundsException e)
+			{
+				continue;
+			}
 		}
 	}
 	

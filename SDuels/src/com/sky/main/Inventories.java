@@ -145,6 +145,8 @@ public class Inventories{
 			list.add("§7Kit Uses: " + (PD.kitLossPotion + PD.kitWinPotion));
 			list.add("§6Kit Wins: " + PD.kitWinPotion);
 			list.add("§8Kit Losses: " + PD.kitLossPotion);
+			list.add("");
+			list.add("§8Win percentage: " + (PD.kitWinPotion/PD.kitLossPotion)*100 + "%");
 			meta.setLore(list);
 			potionStat.setItemMeta(meta);
 			menu.setItem(20, potionStat);
@@ -159,6 +161,8 @@ public class Inventories{
 			list.add("§7Kit Uses: " + (PD.kitLossGapple + PD.kitWinGapple));
 			list.add("§6Kit Wins: " + PD.kitWinGapple);
 			list.add("§8Kit Losses: " + PD.kitLossGapple);
+			list.add("");
+			list.add("§8Win percentage: " + (PD.kitWinGapple/PD.kitLossGapple)*100 + "%");
 			meta.setLore(list);
 			gappleStat.setItemMeta(meta);
 			menu.setItem(22, gappleStat);
@@ -173,6 +177,8 @@ public class Inventories{
 			list.add("§7Kit Uses: " + (PD.kitLossMCSG + PD.kitWinMCSG));
 			list.add("§6Kit Wins: " + PD.kitWinMCSG);
 			list.add("§8Kit Losses: " + PD.kitLossMCSG);
+			list.add("");
+			list.add("§8Win percentage: " + (PD.kitWinMCSG/PD.kitLossMCSG)*100 + "%");
 			meta.setLore(list);
 			mcsgStat.setItemMeta(meta);
 			menu.setItem(24, mcsgStat);

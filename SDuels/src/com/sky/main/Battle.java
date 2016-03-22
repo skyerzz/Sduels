@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -66,6 +67,8 @@ public class Battle implements Listener{
 	public ArrayList<Player> freeze = new ArrayList<Player>();
 	public ArrayList<Player> choosing = new ArrayList<Player>();
 	
+	
+	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
 		if(freeze.contains(event.getPlayer()))
@@ -74,6 +77,7 @@ public class Battle implements Listener{
 		}
 	}
 	
+	@EventHandler
 	public void onTeleport(PlayerTeleportEvent event)
 	{
 		double distance = event.getFrom().distance(event.getTo());
@@ -82,9 +86,11 @@ public class Battle implements Listener{
 		{
 			return;
 		}
-		//TODO: make other player win here.
+		Player winner = this.duels.get(event.getPlayer());
+		this.win(winner);
 	}
-	
+		
+	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event)
 	{
 		if(!(event.getPlayer() instanceof Player))
@@ -98,6 +104,7 @@ public class Battle implements Listener{
 		}
 	}
 	
+	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event)
 	{
 		if(event.getCurrentItem()==null)
@@ -233,6 +240,25 @@ public class Battle implements Listener{
 			break;
 		default: break;
 		}
+		
+		PlayerData lPD = Main.getPlayerData(loser);
+		lPD.losses++;
+		switch(kits.get(player))
+		{
+		case "potion":
+			lPD.kitLossPotion++;
+			break;
+		case "gapple":
+			lPD.kitLossGapple++;
+			break;
+		case "mcsg":
+			lPD.kitLossMCSG++;
+			break;
+		default: break;
+		}
+		
+		this.duels.remove(player);
+		this.duels.remove(loser);
 	}
 	
 	public Location getArena()
