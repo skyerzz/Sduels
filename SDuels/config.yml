@@ -8,9 +8,33 @@ helpmessage:
   - "&cPut your help-message here."
   - "&cuse a - for each new line."
 
+#textchat messages
 duelinvitemessage: "&e<player> Has challenged you to a duel. Click to accept!"
 duelcancelledmessage: "&cNo available arenas, Duel is cancelled!"
 
+#GUI texts
+menuname: "&9Kit Menu"
+
+potionname: "&6Potion PvP"
+potionlore:
+  - "&7POTION- Put your lore here"
+  - ""
+  - "&cUse Empty lines for an empty space in the lore."
+  
+gapplename: "&6Gapple PvP"
+gapplelore:
+  - "&7GAPPLE- Put your lore here"
+  - ""
+  - "&cUse Empty lines for an empty space in the lore."
+  
+MCSG: "&6MCSG"
+MCSG:
+  - "&7MCSG- Put your lore here"
+  - ""
+  - "&cUse Empty lines for an empty space in the lore."
+
+
+#arenas locations
 arenas:
    #examples, remove the # to use this, and replace the locations with correct coordinates.
    #0:

@@ -102,14 +102,14 @@ public class Main extends JavaPlugin implements Listener{
 					float pitch = new Float(location[4]);
 					if(i==1)
 					{
-						loc1 = new Location(Bukkit.getWorld("world"), x, y, z, yaw, pitch);
+						loc1 = new Location(Bukkit.getWorld(location[5]), x, y, z, yaw, pitch);
 					}
 					else
 					{
-						loc2 = new Location(Bukkit.getWorld("world"), x, y, z, yaw, pitch);
+						loc2 = new Location(Bukkit.getWorld(location[5]), x, y, z, yaw, pitch);
 					}
 				}
-				catch(NumberFormatException e)
+				catch(NumberFormatException | ArrayIndexOutOfBoundsException e)
 				{
 					Bukkit.getLogger().severe("Strings for the arenas configuration are not filled out correctly. Error on " + string + ".location" + i);
 					continue;
@@ -132,9 +132,7 @@ public class Main extends JavaPlugin implements Listener{
 		int i = 0;
 		for(String string: helpmessage)
 		{
-			System.out.println(string);
 			this.helpmessage[i] = string.replace("&", "§");
-			System.out.println(this.helpmessage[i]);
 			i++;
 		}
 		
