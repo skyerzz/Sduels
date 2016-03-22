@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -107,10 +108,11 @@ public class Battle implements Listener{
 	public String readyMessage = "§6Your opponent is ready!";
 	
 	public String scoreboardName = "§4Duel";
-	public String bottomscoreboard = "§4I cant recall the server IP.";
+	public String bottomscoreboard = "§4pvp.sandosity.com";
 	
 	public HashMap<Player, Player> duels = new HashMap<Player, Player>();
 	public HashMap<Player, String> kits = new HashMap<Player, String>();
+	public HashMap<Player, Inventory> oldInventory = new HashMap<Player, Inventory>();
 	public ArrayList<Player> ingame = new ArrayList<Player>();
 	public ArrayList<Player> freeze = new ArrayList<Player>();
 	public ArrayList<Player> choosing = new ArrayList<Player>();
@@ -148,6 +150,8 @@ public class Battle implements Listener{
 	{
 		if(this.duels.containsKey(event.getPlayer()))
 		{
+			//ensure the player gets teleported before the connection is closed, to not have them spawn there next time they log in.
+			event.getPlayer().teleport(this.endbattle);
 			Player winner = this.duels.get(event.getPlayer());
 			this.win(winner);			
 		}
@@ -261,6 +265,12 @@ public class Battle implements Listener{
 		}
 		Location loc2 = Main.arenas.get(loc);
 		
+		//save the inventories from the players, so they can get it back after the match.
+		Inventory cInv = challenger.getInventory();
+		Inventory dInv = defender.getInventory();
+		this.oldInventory.put(challenger, cInv);
+		this.oldInventory.put(defender, dInv);
+		
 		//make sure that this arena cannot be used by other people
 		Main.occupiedArenas.put(loc, Main.arenas.get(loc));
 		Main.arenas.remove(loc);
@@ -316,6 +326,16 @@ public class Battle implements Listener{
 	public void win(Player player)
 	{
 		Player loser = this.duels.get(player);
+		
+		//give the players their old inventory back
+		Inventory loserInv = this.oldInventory.get(loser);
+		loser.getInventory().setContents(loserInv.getContents());
+		Inventory playerInv = this.oldInventory.get(player);
+		loser.getInventory().setContents(playerInv.getContents());		
+		this.oldInventory.remove(player);
+		this.oldInventory.remove(loser);
+		
+	
 		if(!this.ingame.contains(player))
 		{
 			//they were not ingame yet, which means the countdown hasnt started. if someone won now

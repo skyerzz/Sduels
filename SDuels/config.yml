@@ -33,7 +33,7 @@ startbattle: "&6GO!"
 readymessage: "&6Your opponent is ready!"
 
 #name of the scoreboard in a game
-scoreboardname: "&4Duel"
+scoreboardname: "&4pvp.sandosity.com"
 
 #this will appear at the bottom of the scoreboard
 bottomscoreboard: "&6I cannot remember the server IP"
@@ -43,6 +43,9 @@ playernonexistant: "&cThis player does not appear in our database!"
 
 #if a player tries to battle themselfs, this shows
 battleself: "&cYou cannot battle yourself!"
+
+
+
 
 #GUI texts
 menuname: "&9Kit Menu"
