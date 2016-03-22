@@ -22,6 +22,8 @@ countdownmessage: "&6The match begins in <seconds> seconds!"
 #When the countdown ends, this messge is send to both players
 startbattle: "&6GO!"
 
+#This message is sent to the other player if an opponent picks a kit.
+readymessage: "&6Your opponent is ready!"
 
 
 

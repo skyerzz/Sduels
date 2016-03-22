@@ -5,11 +5,15 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Battle implements Listener{
@@ -43,13 +47,21 @@ public class Battle implements Listener{
 		{
 			this.countdownmessage = temp.replace("&", "§");
 		}
+		
+		temp = yml.getString("readymessage");
+		if(temp!=null)
+		{
+			this.readyMessage = temp.replace("&", "§");
+		}
 	}
 	
 	public String cancelled = "§cNo available arenas, Duel is cancelled!";
 	public String startbattle = "§6GO!";
 	public String countdownmessage = "§6The match begins in <seconds> seconds!";
+	public String readyMessage = "§6Your opponent is ready!";
 	
 	public HashMap<Player, Player> duels = new HashMap<Player, Player>();
+	public HashMap<Player, String> kits = new HashMap<Player, String>();
 	public ArrayList<Player> ingame = new ArrayList<Player>();
 	public ArrayList<Player> freeze = new ArrayList<Player>();
 	public ArrayList<Player> choosing = new ArrayList<Player>();
@@ -64,7 +76,88 @@ public class Battle implements Listener{
 	
 	public void onTeleport(PlayerTeleportEvent event)
 	{
+		double distance = event.getFrom().distance(event.getTo());
+		System.out.println("" + distance);
+		if(distance < 10)
+		{
+			return;
+		}
 		//TODO: make other player win here.
+	}
+	
+	public void onInventoryClose(InventoryCloseEvent event)
+	{
+		if(!(event.getPlayer() instanceof Player))
+		{
+			return;
+		}
+		Player player = (Player) event.getPlayer();
+		if(this.choosing.contains(player))
+		{
+			inv.showMenu(player);
+		}
+	}
+	
+	public void onInventoryClick(InventoryClickEvent event)
+	{
+		if(event.getCurrentItem()==null)
+		{
+			return;
+		}
+		ItemStack clicked = event.getCurrentItem();
+		
+		if(event.getClickedInventory()==null)
+		{
+			return;
+		}
+		if(event.getClickedInventory().getName()==null)
+		{
+			return;
+		}
+		if(!(event.getWhoClicked() instanceof Player))
+		{
+			return;
+		}
+		
+		String invName = event.getClickedInventory().getName();
+		Player player = (Player) event.getWhoClicked();
+		if(invName.equals(this.inv.menuname))
+		{
+			Material test = clicked.getType();
+			if(test == Material.POTION)
+			{
+				//TODO: give potion kit
+				this.kits.put(player, "potion");
+				ready(player);
+				return;
+			}
+			if(test == Material.GOLDEN_APPLE)
+			{
+				//TODO: give golden apple kit
+				this.kits.put(player, "gapple");
+				ready(player);
+				return;
+			}
+			if(test == Material.FISHING_ROD)
+			{
+				//TODO: give MCSG kit
+				this.kits.put(player, "mcsg");
+				ready(player);
+				return;
+			}
+		}
+	}
+	
+	public void ready(Player player)
+	{
+		Player opponent = this.duels.get(player);
+		opponent.sendMessage(this.readyMessage);
+		this.choosing.remove(player);
+		if(!this.choosing.contains(opponent))
+		{
+			this.countDown(player, opponent);
+		}
+		player.closeInventory();
 	}
 	
 	public void startBattle(Player challenger, Player defender)
@@ -94,7 +187,7 @@ public class Battle implements Listener{
 		
 	}
 	
-	public void countDown(Player challenger, Player defender)
+	public void countDown(Player player, Player opponent)
 	{		
 		new BukkitRunnable() 
 		{
@@ -105,21 +198,41 @@ public class Battle implements Listener{
 				   if(i>=5)
 				   {
 					   //start the battle, unfreeze them and cancel the runnable.
-					   challenger.sendMessage(startbattle);
-					   defender.sendMessage(startbattle);
-					   freeze.remove(challenger);
-					   freeze.remove(defender);
+					   player.sendMessage(startbattle);
+					   opponent.sendMessage(startbattle);
+					   freeze.remove(player);
+					   freeze.remove(opponent);
 					   this.cancel();
 					   return;
 				   }
 				   //send both players the countdown message
 				   String count = 5-i + "";
 				   String currentcountdownmessage = countdownmessage.replace("<seconds>", count);
-				   challenger.sendMessage(currentcountdownmessage);
-				   defender.sendMessage(currentcountdownmessage);
+				   player.sendMessage(currentcountdownmessage);
+				   opponent.sendMessage(currentcountdownmessage);
 			   }
 		}.runTaskTimer(this.main, 0L, 20L);
 
+	}
+	
+	public void win(Player player)
+	{
+		Player loser = this.duels.get(player);
+		PlayerData pPD = Main.getPlayerData(player);
+		pPD.wins++;
+		switch(kits.get(player))
+		{
+		case "potion":
+			pPD.kitWinPotion++;
+			break;
+		case "gapple":
+			pPD.kitWinGapple++;
+			break;
+		case "mcsg":
+			pPD.kitWinMCSG++;
+			break;
+		default: break;
+		}
 	}
 	
 	public Location getArena()

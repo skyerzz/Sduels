@@ -36,6 +36,7 @@ public class Main extends JavaPlugin implements Listener{
 	
 	public String duelInviteMessage = "§e<player> Has challenged you to a duel. Click to accept!";
 	public String[] helpmessage;
+	public static String maindatafolder;
 	
 	@Override
 	public void onEnable() 
@@ -47,9 +48,9 @@ public class Main extends JavaPlugin implements Listener{
 	    }
 	    for(Player player: Bukkit.getOnlinePlayers())
 	    {
-	    	Main.playerData.put(player, this.getPlayerData(player));
+	    	Main.playerData.put(player, Main.getPlayerData(player));
 	    }
-	    
+	    Main.maindatafolder = this.getDataFolder() + "";
 	    reload();
 	    
 	    this.battle = new Battle(this);
@@ -149,7 +150,7 @@ public class Main extends JavaPlugin implements Listener{
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event){
 		Player player = event.getPlayer();
-		PlayerData PD = this.getPlayerData(player);
+		PlayerData PD = Main.getPlayerData(player);
 		Main.playerData.put(player, PD);	    
 	}
 	
@@ -159,12 +160,12 @@ public class Main extends JavaPlugin implements Listener{
 		this.savePlayerData(player);
 	}
 	
-	public PlayerData getPlayerData(OfflinePlayer objective)
+	public static PlayerData getPlayerData(OfflinePlayer objective)
 	{
 		if(objective == null)
 		{
-			this.getLogger().info("PlayerData returning for player  = null");
-			String nullpath = this.getDataFolder() + "/players/null.yml";
+			System.out.println("PlayerData returning for player  = null");
+			String nullpath = Main.maindatafolder + "/players/null.yml";
 			return new PlayerData(nullpath, null);
 		}
 		
@@ -173,8 +174,8 @@ public class Main extends JavaPlugin implements Listener{
 			return playerData.get(objective);
 		}
 		
-		String path = this.getDataFolder() + "/players/" + objective.getUniqueId() + ".yml";
-		this.getLogger().info("PlayerData retrieved for player " + objective.getName());
+		String path = Main.maindatafolder + "/players/" + objective.getUniqueId() + ".yml";
+		System.out.println("PlayerData retrieved for player " + objective.getName());
 
 		return new PlayerData(path, objective);
 		
