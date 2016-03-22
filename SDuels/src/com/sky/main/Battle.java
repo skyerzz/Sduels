@@ -318,12 +318,17 @@ public class Battle implements Listener{
 		Player loser = this.duels.get(player);
 		if(!this.ingame.contains(player))
 		{
+			//they were not ingame yet, which means the countdown hasnt started. if someone won now
+			//its likely to be by a leave of the other player. Therefore we cancel the duel.
 			player.sendMessage(this.cancelled);
 			loser.sendMessage(this.cancelled);
 			this.duels.remove(player);
 			this.duels.remove(loser);
 			this.kits.remove(player);
 			this.kits.remove(loser);
+
+			player.teleport(this.endbattle);
+			loser.teleport(this.endbattle);
 			return;
 		}
 		
