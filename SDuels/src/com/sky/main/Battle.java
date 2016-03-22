@@ -377,6 +377,10 @@ public class Battle implements Listener{
 		}
 		pPD.addPreviousDuel(loser.getUniqueId().toString(), 1);
 		pPD.addPreviousDuelWin(loser.getUniqueId().toString(), 1);
+		if(!player.isOnline())
+		{
+			pPD.save();
+		}
 		
 		//give the loser some stats
 		PlayerData lPD = Main.getPlayerData(loser);
@@ -395,6 +399,10 @@ public class Battle implements Listener{
 		default: break;
 		}
 		lPD.addPreviousDuel(player.getUniqueId().toString(), 1);
+		if(!loser.isOnline())
+		{
+			lPD.save();
+		}
 		
 		//remove both players from all data stored again and teleport them to specified location in config.
 		this.duels.remove(player);
