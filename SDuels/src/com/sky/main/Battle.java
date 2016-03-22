@@ -28,12 +28,14 @@ import org.bukkit.scoreboard.Scoreboard;
 public class Battle implements Listener{
 
 	Inventories inv;
+	Kits Ckits;
 	
 	Main main;
 	public Battle(Main main)
 	{
 		this.main = main;
 		inv = new Inventories(this.main);
+		Ckits = new Kits(this.main);
 		loadStrings(main.yml);
 		loadOthers(main.yml);
 	}
@@ -253,6 +255,7 @@ public class Battle implements Listener{
 		duels.put(challenger, defender);
 		duels.put(defender, challenger);
 		
+		
 		Location loc = this.getArena();
 		if(loc==null)
 		{
@@ -291,10 +294,13 @@ public class Battle implements Listener{
 	
 	public void countDown(Player player, Player opponent)
 	{		
+		//give both players a scoreboard and their kit
 		this.ingame.add(player);
 		this.ingame.add(opponent);
 		this.updateScoreBoard(player);
 		this.updateScoreBoard(opponent);
+		Ckits.givePlayerKit(player, this.kits.get(player));
+		Ckits.givePlayerKit(opponent, this.kits.get(opponent));
 		
 		//countdown from 5.
 		new BukkitRunnable() 
