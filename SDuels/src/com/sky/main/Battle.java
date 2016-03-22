@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,6 +19,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
 
 public class Battle implements Listener{
 
@@ -56,12 +61,27 @@ public class Battle implements Listener{
 		{
 			this.readyMessage = temp.replace("&", "§");
 		}
+		
+		temp = yml.getString("scoreboardname");
+		if(temp!=null)
+		{
+			this.scoreboardName = temp.replace("&", "§");
+		}
+		
+		temp = yml.getString("bottomscoreboard");
+		if(temp!=null)
+		{
+			this.bottomscoreboard = temp.replace("&", "§");
+		}
 	}
 	
 	public String cancelled = "§cNo available arenas, Duel is cancelled!";
 	public String startbattle = "§6GO!";
 	public String countdownmessage = "§6The match begins in <seconds> seconds!";
 	public String readyMessage = "§6Your opponent is ready!";
+	
+	public String scoreboardName = "§4Duel";
+	public String bottomscoreboard = "§4I cant recall the server IP.";
 	
 	public HashMap<Player, Player> duels = new HashMap<Player, Player>();
 	public HashMap<Player, String> kits = new HashMap<Player, String>();
@@ -218,7 +238,9 @@ public class Battle implements Listener{
 		challenger.teleport(loc);
 		defender.teleport(loc2);
 		
-		//make both players choose their kit
+		//make both players choose their kit, freeze them while they do.
+		this.freeze.add(challenger);
+		this.freeze.add(defender);
 		choosing.add(challenger);
 		choosing.add(defender);		
 		inv.showMenu(challenger);
@@ -302,7 +324,61 @@ public class Battle implements Listener{
 		this.kits.remove(player);
 		this.kits.remove(loser);
 		this.ingame.remove(player);
-		this.ingame.remove(player);
+		this.ingame.remove(loser);
+	}
+	
+	public void updateScoreBoard(Player player)
+	{
+		Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+		final Objective o = board.registerNewObjective(scoreboardName, "dummy");
+	    o.setDisplaySlot(DisplaySlot.SIDEBAR);
+	    
+	    //empty line
+	    Score s1 = o.getScore("");
+	    s1.setScore(3);
+	    
+	    //set player + chosen kit
+	    String kit = this.kits.get(player);
+	    String kitname = "NULL";
+	    switch(kit)
+	    {
+	    case "potion":
+	    	kitname = inv.potionName;
+	    	break;
+	    case "gapple":
+	    	kitname = inv.gappleName;
+	    	break;
+	    case "mcsg":
+	    	kitname = inv.mcsgName;
+	    	break;
+	    }
+	    Score s2 = o.getScore(player.getName() + "§67: " + kitname);
+	    s2.setScore(2);
+	    
+	    //get the kit from the opponent next.
+	    Player opponent = this.duels.get(player);	    
+	    String kit2 = this.kits.get(opponent);
+	    String kitname2 = "NULL";
+	    switch(kit2)
+	    {
+	    case "potion":
+	    	kitname2 = inv.potionName;
+	    	break;
+	    case "gapple":
+	    	kitname2 = inv.gappleName;
+	    	break;
+	    case "mcsg":
+	    	kitname2 = inv.mcsgName;
+	    	break;
+	    }
+	    Score s3 = o.getScore(opponent.getName() + "§67: " + kitname2);
+	    s3.setScore(1);
+	    
+	    Score s4 = o.getScore(this.bottomscoreboard);
+	    s4.setScore(0);
+	    
+	    
+		player.setScoreboard(board);
 	}
 	
 	public Location getArena()

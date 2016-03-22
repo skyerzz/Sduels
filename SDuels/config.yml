@@ -10,8 +10,12 @@ helpmessage:
 
 #textchat messages
 
+#nopermissions message
+nopermissionsmessage: "§cYou do not have permissions for this!"
+
 #what a player sees if they get invited to duel
 duelinvitemessage: "&e<player> Has challenged you to a duel. Click to accept!"
+duelinvitehover: "&eClick to accept the duel!"
 
 #if the duel gets cancelled, this message will be send to both players
 duelcancelledmessage: "&cNo available arenas, Duel is cancelled!"
@@ -27,6 +31,12 @@ startbattle: "&6GO!"
 
 #This message is sent to the other player if an opponent picks a kit.
 readymessage: "&6Your opponent is ready!"
+
+#name of the scoreboard in a game
+scoreboardname: "&4Duel"
+
+#this will appear at the bottom of the scoreboard
+bottomscoreboard: "&6I cannot remember the server IP"
 
 
 

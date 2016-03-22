@@ -2,7 +2,7 @@
 name: Sduel
 main: com.sky.main.Main
 author: skyerzz
-version: 1.0.0
+version: 1.5.2
 prefix: Sduel
 
 commands:
@@ -10,7 +10,5 @@ commands:
     description: Standard command for Duel
     
 permissions:    
-    SkyWars.remove.coinsonwin:
-        default: op
-    SkyWars.remove.coinsonkill:
+    duel.duel
         default: op

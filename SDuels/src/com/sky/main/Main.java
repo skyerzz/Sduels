@@ -36,6 +36,8 @@ public class Main extends JavaPlugin implements Listener{
 	
 	public String duelInviteMessage = "§e<player> Has challenged you to a duel. Click to accept!";
 	public String alreadyInGame = "§eOne of the players is already in a duel!";
+	public String duelhovermessage = "§eClick to accept the duel!";
+	public String noperms = "§cYou do not have permissions for this!";
 	public String[] helpmessage;
 	public static String maindatafolder;
 	
@@ -152,6 +154,12 @@ public class Main extends JavaPlugin implements Listener{
 			this.alreadyInGame = temp.replace("&", "§");
 		}
 		
+		temp = yml.getString("nopermissionmessage");
+		if(temp!=null)
+		{
+			this.noperms = temp.replace("&", "§");
+		}
+		
 	}
 	
 	@EventHandler
@@ -211,6 +219,11 @@ public class Main extends JavaPlugin implements Listener{
 				  return true;
 			  }
 			  Player player = (Player) sender;
+			  if(!player.hasPermission("duel.duel"))
+			  {
+				  player.sendMessage(this.noperms);
+				  return true;
+			  }
 			  if(args.length == 0)
 			  {
 				  sendHelpMessage(player);
@@ -293,7 +306,7 @@ public class Main extends JavaPlugin implements Listener{
 				  
 				  //message player 2 that someone challenged them.
 			  	  TextComponent textDuel = new TextComponent(this.duelInviteMessage.replace("<player>", player.getName()));
-				  textDuel.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,  new ComponentBuilder("§eClick to accept the duel.").create() ));
+				  textDuel.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,  new ComponentBuilder(duelhovermessage).create() ));
 				  textDuel.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/duel accept " + player.getName()));
 				  player.spigot().sendMessage(textDuel);
 			  }
