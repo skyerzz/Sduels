@@ -9,8 +9,21 @@ helpmessage:
   - "&cuse a - for each new line."
 
 #textchat messages
+
+#what a player sees if they get invited to duel
 duelinvitemessage: "&e<player> Has challenged you to a duel. Click to accept!"
+
+#if the duel gets cancelled, this message will be send to both players
 duelcancelledmessage: "&cNo available arenas, Duel is cancelled!"
+
+#The countdown for the battle. <seconds> gets replaced with the current seconds till the match begins.
+countdownmessage: "&6The match begins in <seconds> seconds!"
+
+#When the countdown ends, this messge is send to both players
+startbattle: "&6GO!"
+
+
+
 
 #GUI texts
 menuname: "&9Kit Menu"
@@ -18,7 +31,7 @@ menuname: "&9Kit Menu"
 potionname: "&6Potion PvP"
 potionlore:
   - "&7POTION- Put your lore here"
-  - ""
+  - "TEST"
   - "&cUse Empty lines for an empty space in the lore."
   
 gapplename: "&6Gapple PvP"
@@ -27,8 +40,8 @@ gapplelore:
   - ""
   - "&cUse Empty lines for an empty space in the lore."
   
-MCSG: "&6MCSG"
-MCSG:
+mcsgname: "&6MCSG"
+mcsglore:
   - "&7MCSG- Put your lore here"
   - ""
   - "&cUse Empty lines for an empty space in the lore."

@@ -25,7 +25,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class Main extends JavaPlugin implements Listener{
 
-	Battle battle = new Battle(this);
+	Battle battle;
 	
 	public YamlConfiguration yml;
 	
@@ -51,6 +51,8 @@ public class Main extends JavaPlugin implements Listener{
 	    }
 	    
 	    reload();
+	    
+	    this.battle = new Battle(this);
 	}
 	
 	@Override	
@@ -142,12 +144,6 @@ public class Main extends JavaPlugin implements Listener{
 			this.duelInviteMessage = temp.replace("&", "§");
 		}
 		
-		temp = yml.getString("duelcancelledmessage");
-		if(temp!=null)
-		{
-			this.battle.cancelled = temp.replace("&", "§");
-		}
-		
 	}
 	
 	@EventHandler
@@ -210,6 +206,12 @@ public class Main extends JavaPlugin implements Listener{
 			  if(args.length == 0)
 			  {
 				  sendHelpMessage(player);
+				  return true;
+			  }
+			  
+			  if(args[0].equalsIgnoreCase("testinv"))
+			  {
+				  this.battle.inv.showMenu(player);
 				  return true;
 			  }
 			  

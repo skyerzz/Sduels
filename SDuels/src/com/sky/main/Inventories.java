@@ -23,7 +23,7 @@ public class Inventories{
 	String menuname = "§9Kit Menu";
 	
 	String potionName = "§6Potion PvP", gappleName = "§6Gapple PvP", mcsgName = "§6MCSG";
-	ArrayList<String> potionlore, gapplelore, mcsglore;
+	ArrayList<String> potionlore = new ArrayList<String>(), gapplelore = new ArrayList<String>(), mcsglore = new ArrayList<String>();
 	
 	@SuppressWarnings("unchecked")
 	public void getStrings(YamlConfiguration yml)
@@ -43,6 +43,7 @@ public class Inventories{
 		;
 		for(String string: (List<String>) yml.getList("potionlore"))
 		{
+			
 			this.potionlore.add(string.replace("&", "§"));
 		}
 		
@@ -106,5 +107,7 @@ public class Inventories{
 			mcsg.setItemMeta(meta);
 			menu.setItem(6, mcsg);
 		}
+		
+		player.openInventory(menu);
 	}
 }
