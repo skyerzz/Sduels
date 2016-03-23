@@ -68,7 +68,12 @@ public class Main extends JavaPlugin implements Listener{
 	@Override	
 	public void onDisable() 
 	{
-		getLogger().info("Disabling Sduels");		
+		getLogger().info("Disabling Sduels");
+		for(Player player: Main.playerData.keySet())
+		{
+			PlayerData PD = Main.playerData.get(player);
+			PD.save();
+		}
 	}
 	
 	public void reload()

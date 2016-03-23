@@ -366,6 +366,13 @@ public class Battle implements Listener{
 					   opponent.sendMessage(startbattle);
 					   freeze.remove(player);
 					   freeze.remove(opponent);
+					   //lets heal the players to begin a fair match
+					   player.setHealth(20);
+					   player.setSaturation(20);
+					   player.setFoodLevel(20);
+					   opponent.setHealth(20);
+					   opponent.setSaturation(20);
+					   opponent.setFoodLevel(20);
 					   this.cancel();
 					   return;
 				   }

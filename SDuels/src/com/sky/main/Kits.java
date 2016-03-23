@@ -85,24 +85,24 @@ public class Kits {
 		player.getInventory().setLeggings(this.getDiamondGear("leggings", ench, level));
 		player.getInventory().setBoots(this.getDiamondGear("boots", ench, level));
 		
-		player.getInventory().addItem(this.getDiamondGear("chestplate", ench, level));
-		player.getInventory().addItem(this.getDiamondGear("helmet", ench, level));
-		player.getInventory().addItem(this.getDiamondGear("leggings", ench, level));
-		player.getInventory().addItem(this.getDiamondGear("boots", ench, level));
+		player.getInventory().setItem(10, this.getDiamondGear("chestplate", ench, level));
+		player.getInventory().setItem(9, this.getDiamondGear("helmet", ench, level));
+		player.getInventory().setItem(11, this.getDiamondGear("leggings", ench, level));
+		player.getInventory().setItem(12, this.getDiamondGear("boots", ench, level));
 		
 		ench[0] = Enchantment.DAMAGE_ALL; ench[1] = Enchantment.FIRE_ASPECT;
 		level[1] = 2;
 		
-		player.getInventory().addItem(this.getSword("diamond", ench, level));		
+		player.getInventory().setItem(0, this.getSword("diamond", ench, level));		
 
-		player.getInventory().addItem(new ItemStack(Material.GOLDEN_APPLE, 32, (short) 1));
+		player.getInventory().setItem(1, new ItemStack(Material.GOLDEN_APPLE, 32, (short) 1));
 		
 		Potion strength = new Potion(PotionType.STRENGTH, 1);
-		player.getInventory().addItem(strength.toItemStack(2));
+		player.getInventory().setItem(7, strength.toItemStack(2));
 		
 
 		Potion speed = new Potion(PotionType.SPEED, 2);
-		player.getInventory().addItem(speed.toItemStack(2));
+		player.getInventory().setItem(8, speed.toItemStack(2));
 		
 	}
 	
@@ -126,8 +126,8 @@ public class Kits {
 		pot.setSplash(true);
 		player.getInventory().setItem(1, pot.toItemStack(32));
 		
-		player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 50000, 2));
-		player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 50000, 1));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 50000, 1));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 50000, 0));
 		
 		player.getInventory().setItem(2, new ItemStack(Material.BAKED_POTATO, 32));
 	}
