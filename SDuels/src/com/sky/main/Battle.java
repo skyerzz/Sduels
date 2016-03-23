@@ -275,6 +275,11 @@ public class Battle implements Listener{
 	
 	public void startBattle(Player challenger, Player defender)
 	{
+		if(challenger==null || defender==null)
+		{
+			System.out.println("startbattle has a null player, cancelled!");
+			return;
+		}
 		duels.put(challenger, defender);
 		duels.put(defender, challenger);
 		
@@ -400,6 +405,7 @@ public class Battle implements Listener{
 		{
 			//they were not ingame yet, which means the countdown hasnt started. if someone won now
 			//its likely to be by a leave of the other player. Therefore we cancel the duel.
+			System.out.println("Cancelled battle");
 			player.sendMessage(this.cancelled);
 			loser.sendMessage(this.cancelled);
 			this.duels.remove(player);
@@ -414,6 +420,18 @@ public class Battle implements Listener{
 			this.freeze.remove(player);
 			player.closeInventory();
 			loser.closeInventory();
+			
+			//free the arena again
+			Location loc = this.arena.get(player);
+			if(loc==null)
+			{
+				loc = this.arena.get(loser);
+			}
+			Location loc2 = Main.occupiedArenas.get(loc);
+			Main.arenas.put(loc, loc2);
+			Main.occupiedArenas.remove(loc);
+			this.arena.remove(player);
+			this.arena.remove(loser);
 
 			player.teleport(this.endbattle);
 			loser.teleport(this.endbattle);
