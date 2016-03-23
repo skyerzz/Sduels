@@ -123,7 +123,7 @@ public class Inventories{
 			mcsg.setItemMeta(meta);
 			menu.setItem(6, mcsg);
 		}
-		
+		System.out.println("Showing menu for " + player.getName());
 		player.openInventory(menu);
 	}
 

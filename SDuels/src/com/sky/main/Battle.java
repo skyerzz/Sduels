@@ -17,7 +17,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -116,7 +115,7 @@ public class Battle implements Listener{
 	
 	public HashMap<Player, Player> duels = new HashMap<Player, Player>();
 	public HashMap<Player, String> kits = new HashMap<Player, String>();
-	public HashMap<Player, Inventory> oldInventory = new HashMap<Player, Inventory>();
+	public HashMap<Player, ItemStack[]> oldInventory = new HashMap<Player, ItemStack[]>();
 	public HashMap<Player, ItemStack[]> oldArmor = new HashMap<Player, ItemStack[]>();
 	public HashMap<Player, Location> arena = new HashMap<Player, Location>();
 	public ArrayList<Player> ingame = new ArrayList<Player>();
@@ -188,7 +187,7 @@ public class Battle implements Listener{
 		
 	}
 	
-	//@EventHandler
+	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event)
 	{
 		if(!(event.getPlayer() instanceof Player))
@@ -198,6 +197,7 @@ public class Battle implements Listener{
 		Player player = (Player) event.getPlayer();
 		if(this.choosing.contains(player))
 		{
+			System.out.println("INVCLOSE");
 			inv.showMenu(player);
 		}
 	}
@@ -297,8 +297,8 @@ public class Battle implements Listener{
 		Location loc2 = Main.arenas.get(loc);
 		
 		//save the inventories from the players, so they can get it back after the match.
-		Inventory cInv = challenger.getInventory();
-		Inventory dInv = defender.getInventory();
+		ItemStack[] cInv = challenger.getInventory().getContents();
+		ItemStack[] dInv = defender.getInventory().getContents();
 		this.oldInventory.put(challenger, cInv);
 		this.oldInventory.put(defender, dInv);
 		this.oldArmor.put(challenger, challenger.getInventory().getArmorContents());
@@ -317,12 +317,14 @@ public class Battle implements Listener{
 		this.freeze.add(defender);
 		choosing.add(challenger);
 		choosing.add(defender);		
-		inv.showMenu(challenger);
-		inv.showMenu(defender);		
 
 		//teleport the players to said arena
 		challenger.teleport(loc);
 		defender.teleport(loc2);
+		
+		
+		inv.showMenu(challenger);
+		inv.showMenu(defender);	
 		
 	}
 	
@@ -369,14 +371,12 @@ public class Battle implements Listener{
 		Player loser = this.duels.get(player);
 		
 		//give the players their old inventory back
-		Inventory loserInv = this.oldInventory.get(loser);
 		loser.getInventory().clear();
-		loser.getInventory().setContents(loserInv.getContents());
+		loser.getInventory().setContents(this.oldInventory.get(loser));
 		loser.getInventory().setArmorContents(this.oldArmor.get(loser));
 		loser.updateInventory();
-		Inventory playerInv = this.oldInventory.get(player);
 		player.getInventory().clear();
-		player.getInventory().setContents(playerInv.getContents());
+		player.getInventory().setContents(this.oldInventory.get(player));
 		player.getInventory().setArmorContents(this.oldArmor.get(player));
 		player.updateInventory();
 		
@@ -508,6 +508,16 @@ public class Battle implements Listener{
 		Main.occupiedArenas.remove(loc);
 		this.arena.remove(player);
 		this.arena.remove(loser);
+		
+		//remove the scoreboard for both players
+		if(player.isOnline())
+		{
+			player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+		}
+		if(loser.isOnline())
+		{
+			loser.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+		}
 	}
 	
 	public void updateScoreBoard(Player player)
