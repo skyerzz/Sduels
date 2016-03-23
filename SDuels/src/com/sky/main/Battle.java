@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -154,6 +155,11 @@ public class Battle implements Listener{
 		{
 			//ensure the player gets teleported before the connection is closed, to not have them spawn there next time they log in.
 			event.getPlayer().teleport(this.endbattle);
+			//also make sure that their potion effects run out
+			for(PotionEffect effect: event.getPlayer().getActivePotionEffects())
+			{
+				event.getPlayer().removePotionEffect(effect.getType());
+			}
 			Player winner = this.duels.get(event.getPlayer());
 			this.win(winner);			
 		}
@@ -337,9 +343,19 @@ public class Battle implements Listener{
 		Inventory loserInv = this.oldInventory.get(loser);
 		loser.getInventory().setContents(loserInv.getContents());
 		Inventory playerInv = this.oldInventory.get(player);
-		loser.getInventory().setContents(playerInv.getContents());		
+		player.getInventory().setContents(playerInv.getContents());		
 		this.oldInventory.remove(player);
 		this.oldInventory.remove(loser);
+		
+		//remove effects from both players
+		for(PotionEffect effect: player.getActivePotionEffects())
+		{
+			player.removePotionEffect(effect.getType());
+		}
+		for(PotionEffect effect: loser.getActivePotionEffects())
+		{
+			loser.removePotionEffect(effect.getType());
+		}
 		
 	
 		if(!this.ingame.contains(player))
