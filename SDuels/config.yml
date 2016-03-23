@@ -47,6 +47,12 @@ battleself: "&cYou cannot battle yourself!"
 #if the player tries to accept a duel when the opponent never invited them
 nochallenge: "&cThis player did not challenge you!";
 
+#for the winner:
+winmessage: "&6You Won!"
+
+#for the loser:
+lossmessage: "&6You Lost!"
+
 
 
 

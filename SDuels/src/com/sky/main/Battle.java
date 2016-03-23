@@ -78,6 +78,18 @@ public class Battle implements Listener{
 		{
 			this.bottomscoreboard = temp.replace("&", "§");
 		}
+		
+		temp = yml.getString("winmessage");
+		if(temp!=null)
+		{
+			this.winmessage = temp.replace("&", "§");
+		}
+		
+		temp = yml.getString("lossmessage");
+		if(temp!=null)
+		{
+			this.lossmessage = temp.replace("&", "§");
+		}
 	}
 	
 	public void loadOthers(YamlConfiguration yml)
@@ -109,6 +121,8 @@ public class Battle implements Listener{
 	public String startbattle = "§6GO!";
 	public String countdownmessage = "§6The match begins in <seconds> seconds!";
 	public String readyMessage = "§6Your opponent is ready!";
+	public String winmessage = "§6You Won!";
+	public String lossmessage = "§6You Lost!";
 	
 	public String scoreboardName = "§4Duel";
 	public String bottomscoreboard = "§4pvp.sandosity.com";
@@ -388,8 +402,8 @@ public class Battle implements Listener{
 		
 		
 		//little message
-		loser.sendMessage("You lost!");
-		player.sendMessage("You won!");
+		loser.sendMessage(this.lossmessage);
+		player.sendMessage(this.winmessage);
 		
 		//remove effects from both players
 		for(PotionEffect effect: player.getActivePotionEffects())
