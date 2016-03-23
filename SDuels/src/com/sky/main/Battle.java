@@ -130,14 +130,14 @@ public class Battle implements Listener{
 	{
 		if(freeze.contains(event.getPlayer()))
 		{
-			event.setCancelled(true);
+			event.getPlayer().teleport(event.getFrom());
 		}
 	}
 	
 	@EventHandler
 	public void onTeleport(PlayerTeleportEvent event)
 	{
-		if(!this.duels.containsKey(event.getPlayer()))
+		if(!this.duels.containsKey(event.getPlayer()) || this.freeze.contains(event.getPlayer()))
 		{
 			return;
 		}
@@ -311,9 +311,6 @@ public class Battle implements Listener{
 		Main.arenas.remove(loc);
 		this.arena.put(challenger, loc);
 		
-		//teleport the players to said arena
-		challenger.teleport(loc);
-		defender.teleport(loc2);
 		
 		//make both players choose their kit, freeze them while they do.
 		this.freeze.add(challenger);
@@ -321,7 +318,11 @@ public class Battle implements Listener{
 		choosing.add(challenger);
 		choosing.add(defender);		
 		inv.showMenu(challenger);
-		inv.showMenu(defender);
+		inv.showMenu(defender);		
+
+		//teleport the players to said arena
+		challenger.teleport(loc);
+		defender.teleport(loc2);
 		
 	}
 	
