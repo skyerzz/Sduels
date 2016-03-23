@@ -188,7 +188,7 @@ public class Battle implements Listener{
 		
 	}
 	
-	@EventHandler
+	//@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event)
 	{
 		if(!(event.getPlayer() instanceof Player))
