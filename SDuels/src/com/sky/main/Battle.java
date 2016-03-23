@@ -11,7 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -39,6 +39,7 @@ public class Battle implements Listener{
 		Ckits = new Kits(this.main);
 		loadStrings(main.yml);
 		loadOthers(main.yml);
+		main.getServer().getPluginManager().registerEvents(this, main);
 	}
 	
 	public void loadStrings(YamlConfiguration yml)
@@ -116,6 +117,8 @@ public class Battle implements Listener{
 	public HashMap<Player, Player> duels = new HashMap<Player, Player>();
 	public HashMap<Player, String> kits = new HashMap<Player, String>();
 	public HashMap<Player, Inventory> oldInventory = new HashMap<Player, Inventory>();
+	public HashMap<Player, ItemStack[]> oldArmor = new HashMap<Player, ItemStack[]>();
+	public HashMap<Player, Location> arena = new HashMap<Player, Location>();
 	public ArrayList<Player> ingame = new ArrayList<Player>();
 	public ArrayList<Player> freeze = new ArrayList<Player>();
 	public ArrayList<Player> choosing = new ArrayList<Player>();
@@ -139,7 +142,6 @@ public class Battle implements Listener{
 			return;
 		}
 		double distance = event.getFrom().distance(event.getTo());
-		System.out.println("" + distance);
 		if(distance < 10)
 		{
 			return;
@@ -166,13 +168,24 @@ public class Battle implements Listener{
 	}
 	
 	@EventHandler
-	public void onPlayerDeath(PlayerDeathEvent event)
+	public void onPlayerDeath(EntityDamageEvent event)
 	{
-		if(this.duels.containsKey(event.getEntity()))
+		if(event.getEntity() instanceof Player)
 		{
-			Player winner = this.duels.get(event.getEntity());
-			this.win(winner);			
+			Player player = (Player) event.getEntity();
+			if(player.getHealth() - event.getFinalDamage() <= 0)
+			{
+				if(this.duels.containsKey(player))
+				{
+					event.setCancelled(true);
+					Player winner = this.duels.get(player);
+					winner.setHealth(20);
+					player.setHealth(20);
+					this.win(winner);			
+				}
+			}
 		}
+		
 	}
 	
 	@EventHandler
@@ -192,7 +205,12 @@ public class Battle implements Listener{
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event)
 	{
-		if(!this.choosing.contains((Player) event.getWhoClicked()))
+		if(!(event.getWhoClicked() instanceof Player))
+		{
+			return;
+		}
+		Player player = (Player) event.getWhoClicked();
+		if(!this.choosing.contains(player))
 		{
 			return;
 		}
@@ -200,54 +218,53 @@ public class Battle implements Listener{
 		{
 			return;
 		}
-		ItemStack clicked = event.getCurrentItem();
+		ItemStack clicked = event.getCurrentItem();		
 		
-		if(event.getClickedInventory()==null)
+		event.setCancelled(true);
+		Material test = clicked.getType();
+		if(test == Material.POTION)
 		{
+			this.Ckits.givePlayerKit(player, "potion");
+			this.kits.put(player, "potion");
+			ready(player);
 			return;
 		}
-		if(event.getClickedInventory().getName()==null)
+		else if(test == Material.GOLDEN_APPLE)
 		{
+			this.Ckits.givePlayerKit(player, "gapple");
+			this.kits.put(player, "gapple");
+			ready(player);
 			return;
 		}
-		if(!(event.getWhoClicked() instanceof Player))
+		else if(test == Material.FISHING_ROD)
 		{
-			return;
-		}
-		
-		String invName = event.getClickedInventory().getName();
-		Player player = (Player) event.getWhoClicked();
-		if(invName.equals(this.inv.menuname))
-		{
-			Material test = clicked.getType();
-			if(test == Material.POTION)
-			{
-				//TODO: give potion kit
-				this.kits.put(player, "potion");
-				ready(player);
-				return;
-			}
-			if(test == Material.GOLDEN_APPLE)
-			{
-				//TODO: give golden apple kit
-				this.kits.put(player, "gapple");
-				ready(player);
-				return;
-			}
-			if(test == Material.FISHING_ROD)
-			{
-				//TODO: give MCSG kit
-				this.kits.put(player, "mcsg");
-				ready(player);
-				return;
-			}
+			this.Ckits.givePlayerKit(player, "mcsg");
+			this.kits.put(player, "mcsg");
+			ready(player);
+			return;		
 		}
 	}
 	
 	public void ready(Player player)
 	{
+		if(duels==null)
+		{
+			System.out.println("duels=null");
+		}
 		Player opponent = this.duels.get(player);
+		if(opponent==null)
+		{
+			System.out.println("opponent null in ready");
+		}
+		if(this.readyMessage == null)
+		{
+			System.out.println("readymessage null");
+		}
 		opponent.sendMessage(this.readyMessage);
+		if(choosing==null)
+		{
+			System.out.println("Choosing=null");
+		}
 		this.choosing.remove(player);
 		if(!this.choosing.contains(opponent))
 		{
@@ -279,10 +296,15 @@ public class Battle implements Listener{
 		Inventory dInv = defender.getInventory();
 		this.oldInventory.put(challenger, cInv);
 		this.oldInventory.put(defender, dInv);
+		this.oldArmor.put(challenger, challenger.getInventory().getArmorContents());
+		this.oldArmor.put(defender, defender.getInventory().getArmorContents());
+		challenger.getInventory().clear();
+		defender.getInventory().clear();
 		
 		//make sure that this arena cannot be used by other people
 		Main.occupiedArenas.put(loc, Main.arenas.get(loc));
 		Main.arenas.remove(loc);
+		this.arena.put(challenger, loc);
 		
 		//teleport the players to said arena
 		challenger.teleport(loc);
@@ -330,6 +352,7 @@ public class Battle implements Listener{
 				   String currentcountdownmessage = countdownmessage.replace("<seconds>", count);
 				   player.sendMessage(currentcountdownmessage);
 				   opponent.sendMessage(currentcountdownmessage);
+				   i++;
 			   }
 		}.runTaskTimer(this.main, 0L, 20L);
 
@@ -341,11 +364,26 @@ public class Battle implements Listener{
 		
 		//give the players their old inventory back
 		Inventory loserInv = this.oldInventory.get(loser);
+		loser.getInventory().clear();
 		loser.getInventory().setContents(loserInv.getContents());
+		loser.getInventory().setArmorContents(this.oldArmor.get(loser));
+		loser.updateInventory();
 		Inventory playerInv = this.oldInventory.get(player);
-		player.getInventory().setContents(playerInv.getContents());		
+		player.getInventory().clear();
+		player.getInventory().setContents(playerInv.getContents());
+		player.getInventory().setArmorContents(this.oldArmor.get(player));
+		player.updateInventory();
+		
+		
 		this.oldInventory.remove(player);
 		this.oldInventory.remove(loser);
+		this.oldArmor.remove(player);
+		this.oldArmor.remove(loser);
+		
+		
+		//little message
+		loser.sendMessage("You lost!");
+		player.sendMessage("You won!");
 		
 		//remove effects from both players
 		for(PotionEffect effect: player.getActivePotionEffects())
@@ -368,6 +406,14 @@ public class Battle implements Listener{
 			this.duels.remove(loser);
 			this.kits.remove(player);
 			this.kits.remove(loser);
+			this.choosing.remove(player);
+			this.choosing.remove(loser);
+			this.ingame.remove(player);
+			this.ingame.remove(loser);
+			this.freeze.remove(loser);
+			this.freeze.remove(player);
+			player.closeInventory();
+			loser.closeInventory();
 
 			player.teleport(this.endbattle);
 			loser.teleport(this.endbattle);
@@ -426,16 +472,44 @@ public class Battle implements Listener{
 		this.kits.remove(player);
 		this.kits.remove(loser);
 		this.ingame.remove(player);
-		this.ingame.remove(loser);
+		this.ingame.remove(loser);		
 		
 		player.teleport(this.endbattle);
 		loser.teleport(this.endbattle);
+		
+
+		//free the arena again
+		Location loc = this.arena.get(player);
+		if(loc==null)
+		{
+			loc = this.arena.get(loser);
+		}
+		Location loc2 = Main.occupiedArenas.get(loc);
+		Main.arenas.put(loc, loc2);
+		Main.occupiedArenas.remove(loc);
+		this.arena.remove(player);
+		this.arena.remove(loser);
 	}
 	
 	public void updateScoreBoard(Player player)
 	{
 		Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+		if(board==null)
+		{
+			System.out.println("BoardNull");
+			return;
+		}
+		if(scoreboardName==null)
+		{
+			scoreboardName = "§4NULL";
+		}
+		if(scoreboardName.length() > 16)
+		{
+			return;
+		}
 		final Objective o = board.registerNewObjective(scoreboardName, "dummy");
+		
+		
 	    o.setDisplaySlot(DisplaySlot.SIDEBAR);	    
 	    
 	    //empty line
@@ -464,7 +538,7 @@ public class Battle implements Listener{
     		kitname = "Choosing...";
     		break;
 	    }
-	    Score s2 = o.getScore(player.getName() + "§67: " + kitname);
+	    Score s2 = o.getScore(player.getName() + "§6: " + kitname);
 	    s2.setScore(2);
 	    
 	    //get the kit from the opponent next.
@@ -490,11 +564,13 @@ public class Battle implements Listener{
     		kitname = "Choosing...";
     		break;
 	    }
-	    Score s3 = o.getScore(opponent.getName() + "§67: " + kitname2);
+	    Score s3 = o.getScore(opponent.getName() + "§6: " + kitname2);
 	    s3.setScore(1);
 	    
-	    Score s4 = o.getScore(this.bottomscoreboard);
-	    s4.setScore(0);
+	   
+		    Score s4 = o.getScore(this.bottomscoreboard);
+		    s4.setScore(0);
+	   
 	    
 	    
 		player.setScoreboard(board);
@@ -504,6 +580,10 @@ public class Battle implements Listener{
 	public Location getArena()
 	{
 		Random rand = new Random();
+		if(Main.arenas.size()<1)
+		{
+			return null;
+		}
 		int randomNumb = rand.nextInt(Main.arenas.size());
 		int i = 0;
 		for(Location loc : Main.arenas.keySet())

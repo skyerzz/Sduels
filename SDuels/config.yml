@@ -32,17 +32,20 @@ startbattle: "&6GO!"
 #This message is sent to the other player if an opponent picks a kit.
 readymessage: "&6Your opponent is ready!"
 
-#name of the scoreboard in a game
-scoreboardname: "&4pvp.sandosity.com"
+#name of the scoreboard in a game MAKE SURE THIS IS NOT LONGER THAN 16 CHARACTERS
+scoreboardname: "&4Duel"
 
 #this will appear at the bottom of the scoreboard
-bottomscoreboard: "&6I cannot remember the server IP"
+bottomscoreboard: "&6pvp.sandosity.com"
 
 #if a player does not exist in our database, this is shown as message (in case of stats call)
 playernonexistant: "&cThis player does not appear in our database!"
 
 #if a player tries to battle themselfs, this shows
 battleself: "&cYou cannot battle yourself!"
+
+#if the player tries to accept a duel when the opponent never invited them
+nochallenge: "&cThis player did not challenge you!";
 
 
 

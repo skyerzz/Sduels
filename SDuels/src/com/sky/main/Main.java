@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,6 +40,7 @@ public class Main extends JavaPlugin implements Listener{
 	public String duelhovermessage = "§eClick to accept the duel!";
 	public String noperms = "§cYou do not have permissions for this!";
 	public String battleself = "§cYou cannot battle yourself!";
+	public String nochallenge = "§cThis player did not challenge you!";
 	
 	public String[] helpmessage;
 	public static String maindatafolder;
@@ -56,6 +58,8 @@ public class Main extends JavaPlugin implements Listener{
 	    	Main.playerData.put(player, Main.getPlayerData(player));
 	    }
 	    Main.maindatafolder = this.getDataFolder() + "";
+		this.getServer().getPluginManager().registerEvents(this, this);
+		
 	    reload();
 	    
 	    this.battle = new Battle(this);
@@ -168,6 +172,12 @@ public class Main extends JavaPlugin implements Listener{
 			this.battleself = temp.replace("&", "§");
 		}
 		
+		temp = yml.getString("nochallenge");
+		if(temp!=null)
+		{
+			this.nochallenge = temp.replace("&", "§");
+		}
+		
 	}
 	
 	@EventHandler
@@ -177,7 +187,15 @@ public class Main extends JavaPlugin implements Listener{
 		Main.playerData.put(player, PD);	    
 	}
 	
+	@EventHandler
 	public void onLogout(PlayerQuitEvent event)
+	{
+		Player player = event.getPlayer();		
+		this.savePlayerData(player);
+	}
+	
+	@EventHandler
+	public void onKick(PlayerKickEvent event)
 	{
 		Player player = event.getPlayer();		
 		this.savePlayerData(player);
@@ -227,6 +245,7 @@ public class Main extends JavaPlugin implements Listener{
 				  return true;
 			  }
 			  Player player = (Player) sender;
+			  Player p2 = null;
 			  if(!player.hasPermission("duel.duel"))
 			  {
 				  player.sendMessage(this.noperms);
@@ -245,9 +264,8 @@ public class Main extends JavaPlugin implements Listener{
 			  }
 			  else if(args[0].equalsIgnoreCase("version"))
 			  {
-				  player.sendMessage("§6Sduels version ");
+				  player.sendMessage("§6Sduels version " + this.getDescription().getVersion());
 				  player.sendMessage("§6Author: skyerzz");
-				  //TODO: version here.
 				  return true;
 			  }
 			  else if(args[0].equalsIgnoreCase("reload"))
@@ -282,8 +300,8 @@ public class Main extends JavaPlugin implements Listener{
 					  return true;
 				  }
 				  this.battle.inv.showStats(player, objective);
-			  }
-			  
+				  return true;
+			  }			  
 			  else if(args[0].equalsIgnoreCase("accept"))
 			  {
 				  //accept a duel.
@@ -294,7 +312,7 @@ public class Main extends JavaPlugin implements Listener{
 				  }
 				  else
 				  {
-					 Player p2 = Bukkit.getPlayer(args[1]);
+					 p2 = Bukkit.getPlayer(args[1]);
 					 //make sure player2 is online and exists.
 					 if(p2 == null)
 					  {
@@ -323,50 +341,67 @@ public class Main extends JavaPlugin implements Listener{
 						  //the numbers match up, lets battle!
 						  battle.startBattle(player, p2);
 					  }
+					  else
+					  {
+						  player.sendMessage(this.nochallenge);
+					  }
 				  }
-			  }			  
+				  return true;
+			  }
+			  else if(args[0].equalsIgnoreCase("invite"))
+			  {
+				  if(args.length < 2)
+				  {
+					  this.sendHelpMessage(player);
+					  return true;
+				  }
+				  p2 = Bukkit.getPlayer(args[1]);
+				  
+			  }
 			  else
 			  {
 				  //args[0] was not any of the above, so we assume its a player.
-				  Player p2 = Bukkit.getPlayer(args[0]);
-				  //check if player2 is actually online and exists.
-				  if(p2 == null)
-				  {
-					  player.sendMessage("§cCould not find player §6" + args[0]);
-					  return true;
-				  }
-				  if(!p2.isOnline())
-				  {
-					  player.sendMessage("§6" + args[0] + " §cis not online!");
-					  return true;					  
-				  }
-				  
-				  if(p2==player)
-				  {
-					  //you sly dog, you cant battle yourself!
-					  player.sendMessage(this.battleself);
-					  return true;
-				  }
-				  
-				  //if one of these players is already in game, stop it!
-				  if(this.battle.ingame.contains(player) || this.battle.ingame.contains(p2))
-				  {
-					  player.sendMessage(alreadyInGame);
-					  p2.sendMessage(alreadyInGame);
-					  return true;
-				  }
-				  
-				  //put p2-player pair in the hashmap, so we can accept it easily. this will put in (challenged, challenger).
-				  duels.put(p2, player);
-				  
-				  //message player 2 that someone challenged them.
-			  	  TextComponent textDuel = new TextComponent(this.duelInviteMessage.replace("<player>", player.getName()));
-				  textDuel.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,  new ComponentBuilder(duelhovermessage).create() ));
-				  textDuel.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/duel accept " + player.getName()));
-				  player.spigot().sendMessage(textDuel);
+				  p2 = Bukkit.getPlayer(args[0]);
+			  }
+				
+			  //check if player2 is actually online and exists.
+			  if(p2 == null)
+			  {
+				  player.sendMessage("§cCould not find player §6" + args[0]);
+				  return true;
+			  }
+			  if(!p2.isOnline())
+			  {
+				  player.sendMessage("§6" + args[0] + " §cis not online!");
+				  return true;					  
 			  }
 			  
+			  if(p2==player)
+			  {
+				  //you sly dog, you cant battle yourself!
+				  player.sendMessage(this.battleself);
+				  return true;
+			  }
+			  
+			  //if one of these players is already in game, stop it!
+			  if(this.battle.ingame.contains(player) || this.battle.ingame.contains(p2))
+			  {
+				  player.sendMessage(alreadyInGame);
+				  p2.sendMessage(alreadyInGame);
+				  return true;
+			  }
+			  
+			  //put p2-player pair in the hashmap, so we can accept it easily. this will put in (challenged, challenger).
+			  duels.put(p2, player);
+			  
+			  //message player 2 that someone challenged them.
+		  	  TextComponent textDuel = new TextComponent(this.duelInviteMessage.replace("<player>", player.getName()));
+			  textDuel.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,  new ComponentBuilder(duelhovermessage).create() ));
+			  textDuel.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/duel accept " + player.getName()));
+			  p2.spigot().sendMessage(textDuel);
 		  }
+			  
+		  
 		return true;
 	}
 	

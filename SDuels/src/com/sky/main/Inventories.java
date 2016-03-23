@@ -45,10 +45,12 @@ public class Inventories{
 		}
 		
 		;
-		for(String string: (List<String>) yml.getList("potionlore"))
+		if(yml.getList("potionlore")!=null)
 		{
-			
-			this.potionlore.add(string.replace("&", "§"));
+			for(String string: (List<String>) yml.getList("potionlore"))
+			{			
+				this.potionlore.add(string.replace("&", "§"));
+			}
 		}
 		
 		temp = yml.getString("gapplename");
@@ -57,10 +59,12 @@ public class Inventories{
 			this.gappleName = temp.replace("&", "§");
 		}
 		
-		;
-		for(String string: (List<String>) yml.getList("gapplelore"))
+		if(yml.getList("gapplelore")!=null)
 		{
-			this.gapplelore.add(string.replace("&", "§"));
+			for(String string: (List<String>) yml.getList("gapplelore"))
+			{
+				this.gapplelore.add(string.replace("&", "§"));
+			}
 		}
 		
 		temp = yml.getString("mcsgname");
@@ -69,16 +73,18 @@ public class Inventories{
 			this.mcsgName = temp.replace("&", "§");
 		}
 		
+		if(yml.getList("mcsglore")!=null)
+		{
+			for(String string: (List<String>) yml.getList("mcsglore"))
+			{
+				this.mcsglore.add(string.replace("&", "§"));
+			}
+		}
+		
 		temp = yml.getString("playernonexsistant");
 		if(temp!=null)
 		{
 			this.playernull = temp.replace("&", "§");
-		}
-		
-		
-		for(String string: (List<String>) yml.getList("mcsglore"))
-		{
-			this.mcsglore.add(string.replace("&", "§"));
 		}
 		
 	}

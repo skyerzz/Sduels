@@ -75,9 +75,9 @@ public class Kits {
 	
 	public void gapple(Player player)
 	{
-		Enchantment[] ench = new Enchantment[1];
+		Enchantment[] ench = new Enchantment[2];
 		ench[0]=Enchantment.PROTECTION_ENVIRONMENTAL; ench[1] = Enchantment.DURABILITY;
-		int[] level = new int[1];
+		int[] level = new int[2];
 		level[0] = 4; level[1] = 3;
 		
 		player.getInventory().setChestplate(this.getDiamondGear("chestplate", ench, level));
@@ -108,9 +108,9 @@ public class Kits {
 	
 	public void potion(Player player)
 	{
-		Enchantment[] ench = new Enchantment[0];
+		Enchantment[] ench = new Enchantment[1];
 		ench[0]=Enchantment.PROTECTION_ENVIRONMENTAL;
-		int[] level = new int[0];
+		int[] level = new int[1];
 		level[0] = 1;
 		
 		player.getInventory().setChestplate(this.getDiamondGear("chestplate", ench, level));
