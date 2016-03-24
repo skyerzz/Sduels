@@ -26,7 +26,7 @@ public class Kits {
 		}
 		for(String string: cs.getKeys(false))
 		{
-			String name = yml.getString(string + ".name");
+			String name = yml.getString("kits." + string + ".name").replace("&", "§");
 			if(name==null)
 			{
 				continue;

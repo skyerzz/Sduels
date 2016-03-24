@@ -46,7 +46,7 @@ playernonexistant: "&cThis player does not appear in our database!"
 battleself: "&cYou cannot battle yourself!"
 
 #if the player tries to accept a duel when the opponent never invited them
-nochallenge: "&cThis player did not challenge you!";
+nochallenge: "&cThis player did not challenge you!"
 
 #for the winner:
 winmessage: "&6You Won!"
@@ -87,7 +87,7 @@ kits:
    gapplekit:
       name: "&6Gapple PvP"
       lore:
-           - "&7POTION- Put your lore here"
+           - "&GAPPLE- Put your lore here"
            - ""
            - "&cUse Empty lines for an empty space in the lore."
       menuitem: 394
@@ -102,13 +102,13 @@ kits:
    mcsg:
       name: "&6MCSG"
       lore:
-           - "&7POTION- Put your lore here"
+           - "&MCSG- Put your lore here"
            - ""
            - "&cUse Empty lines for an empty space in the lore."
       menuitem: 1
       items:
            - 310,1
-           - 311,1,
+           - 311,1
            - 312,1
            - 313,1,0:1,1:100
            - 276,1,16:1,17:4

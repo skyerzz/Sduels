@@ -148,6 +148,7 @@ public class PlayerData
 	public void save()
 	{
 		this.saveCommonData();
+		this.savePreviousDuels();
 		FileManager.saveFile(this.path, this.newyml);
 	}
 

@@ -17,7 +17,7 @@ public class Inventories{
 	public Inventories(Main main)
 	{
 		this.main = main;
-		getStrings(main.yml);
+		getStrings(this.main.yml);
 	}
 
 	String menuname = "§9Kit Menu";
@@ -97,6 +97,7 @@ public class Inventories{
 			ItemStack item = kit.menuitem;
 			menu.setItem(currentslot, item);
 			i++;
+			currentslot++;
 		}
 		
 		player.openInventory(menu);

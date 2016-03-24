@@ -1,12 +1,12 @@
 package com.sky.main;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class Kit {
 
@@ -16,20 +16,20 @@ public class Kit {
 	public ArrayList<String> lore = new ArrayList<String>();
 	public ArrayList<ItemStack> contents = new ArrayList<ItemStack>();
 	
-	@SuppressWarnings("unchecked")
 	public Kit(YamlConfiguration yml, String kit)
 	{
 		kit = "kits." + kit;
+		System.out.println("Loading kit " + kit);
 		
 		String temp = yml.getString(kit + ".name");
 		if(temp!=null)
 		{
-			this.menuname = temp;
+			this.menuname = temp.replace("&", "§");
 		}
 		
 		if(yml.getList(kit + ".lore")!=null)
 		{
-			for(String string: (List<String>) yml.getList("gapplelore"))
+			for(String string:  yml.getStringList(kit + ".lore"))
 			{
 				this.lore.add(string.replace("&", "§"));
 			}
@@ -39,8 +39,10 @@ public class Kit {
 		if(temp!=null)
 		{
 			this.menuitem = getItem(temp);
-			this.menuitem.getItemMeta().setDisplayName(this.menuname);
-			this.menuitem.getItemMeta().setLore(this.lore);
+			ItemMeta meta = this.menuitem.getItemMeta();
+			meta.setDisplayName(this.menuname);
+			meta.setLore(this.lore);
+			this.menuitem.setItemMeta(meta);
 		}
 		
 		if(yml.getList(kit + ".items")!=null)
@@ -124,7 +126,7 @@ public class Kit {
 	public ItemStack enchantItem(String enchantments, ItemStack item)
 	{
 		String[] Sench = enchantments.split(",");
-		for(int i =0; i < Sench.length-1; i++)
+		for(int i =0; i < Sench.length; i++)
 		{
 			if(Sench[i]==null)
 			{

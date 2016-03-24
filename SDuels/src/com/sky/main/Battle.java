@@ -142,7 +142,7 @@ public class Battle implements Listener{
 	{
 		if(freeze.contains(event.getPlayer()))
 		{
-			event.getPlayer().teleport(event.getFrom());
+			event.setTo(event.getFrom());
 		}
 	}
 	
@@ -238,7 +238,14 @@ public class Battle implements Listener{
 			return;
 		}
 		ItemStack clicked = event.getCurrentItem();		
-		
+		if(clicked.getItemMeta()==null)
+		{
+			return;
+		}
+		if(clicked.getItemMeta().getDisplayName()==null)
+		{
+			return;
+		}
 		event.setCancelled(true);
 		
 		//check if they clicked on a page, or a kit
@@ -261,6 +268,7 @@ public class Battle implements Listener{
 		
 		this.Ckits.givePlayerKit(player, clicked.getItemMeta().getDisplayName());
 		this.kits.put(player, clicked.getItemMeta().getDisplayName());
+		this.ready(player);
 	}
 	
 	public void ready(Player player)
@@ -337,8 +345,6 @@ public class Battle implements Listener{
 		this.ingame.add(opponent);
 		this.updateScoreBoard(player);
 		this.updateScoreBoard(opponent);
-		Ckits.givePlayerKit(player, this.kits.get(player));
-		Ckits.givePlayerKit(opponent, this.kits.get(opponent));
 		
 		//countdown from 5.
 		new BukkitRunnable() 

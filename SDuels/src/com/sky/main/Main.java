@@ -60,9 +60,20 @@ public class Main extends JavaPlugin implements Listener{
 	    Main.maindatafolder = this.getDataFolder() + "";
 		this.getServer().getPluginManager().registerEvents(this, this);
 		
+		String path2 = this.getDataFolder() + "/config.yml";	    
+		File file = new File(path2);
+	    if (!file.exists()) {
+	        getLogger().info("config.yml not found, creating!");
+	        saveDefaultConfig();
+	    } else {
+	        getLogger().info("config.yml found, loading!");
+	    }	    
+		this.yml = YamlConfiguration.loadConfiguration(file);
+		
+		
+	    this.battle = new Battle(this);
 	    reload();
 	    
-	    this.battle = new Battle(this);
 	}
 	
 	@Override	
@@ -213,7 +224,7 @@ public class Main extends JavaPlugin implements Listener{
 	{
 		if(objective == null)
 		{
-			System.out.println("PlayerData returning for player  = null");
+			System.out.println("PlayerData returning for player = null");
 			String nullpath = Main.maindatafolder + "/players/null.yml";
 			return new PlayerData(nullpath, null);
 		}
@@ -234,7 +245,7 @@ public class Main extends JavaPlugin implements Listener{
 	{
 		PlayerData PD = playerData.get(player);
 		
-		if(PD.path.equals(this.getDataFolder() + "/MinrCheckpoint/players/thiswillneverbearealplayername.yml"))
+		if(PD.path.equals(this.getDataFolder() + "/players/null.yml"))
 		{
 			System.out.println("PlayerData for " + player.getName() + " is null!");
 			return;
@@ -267,6 +278,7 @@ public class Main extends JavaPlugin implements Listener{
 			  
 			  if(args[0].equalsIgnoreCase("help"))
 			  {
+				  this.battle.inv.showMenu(player, 1);
 				  sendHelpMessage(player);
 				  return true;
 			  }
@@ -302,7 +314,7 @@ public class Main extends JavaPlugin implements Listener{
 				  }
 
 				  int page = 1;
-				  if(args.length < 3)
+				  if(args.length > 2)
 				  {
 					  try
 					  {
