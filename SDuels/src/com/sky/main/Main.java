@@ -90,6 +90,9 @@ public class Main extends JavaPlugin implements Listener{
 		
 		loadArenas();		
 		loadMessages();
+		battle.loadOthers(this.yml);
+		battle.loadStrings(this.yml);
+		battle.Ckits.loadKits(this.yml);
 	}
 	
 	public void loadArenas()

@@ -6,7 +6,6 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -216,10 +215,9 @@ public class Battle implements Listener{
 				   @Override
 				   public void run() 
 				   {
-					   inv.showMenu(player);
+					   inv.showMenu(player, 1);
 				   }
 			}, 1L);
-			inv.showMenu(player);
 		}
 	}
 	
@@ -242,28 +240,27 @@ public class Battle implements Listener{
 		ItemStack clicked = event.getCurrentItem();		
 		
 		event.setCancelled(true);
-		Material test = clicked.getType();
-		if(test == Material.POTION)
+		
+		//check if they clicked on a page, or a kit
+		if(event.getSlot() == 45 || event.getSlot() == 53)
 		{
-			this.Ckits.givePlayerKit(player, "potion");
-			this.kits.put(player, "potion");
-			ready(player);
+			String name = event.getCurrentItem().getItemMeta().getDisplayName().toLowerCase();
+			name = name.replace("page ", "").trim();
+			int newpage = 1;
+			try
+			{
+				newpage = Integer.parseInt(name);
+			}
+			catch(NumberFormatException e)
+			{
+				
+			}
+			this.inv.showMenu(player, newpage);
 			return;
 		}
-		else if(test == Material.GOLDEN_APPLE)
-		{
-			this.Ckits.givePlayerKit(player, "gapple");
-			this.kits.put(player, "gapple");
-			ready(player);
-			return;
-		}
-		else if(test == Material.FISHING_ROD)
-		{
-			this.Ckits.givePlayerKit(player, "mcsg");
-			this.kits.put(player, "mcsg");
-			ready(player);
-			return;		
-		}
+		
+		this.Ckits.givePlayerKit(player, clicked.getItemMeta().getDisplayName());
+		this.kits.put(player, clicked.getItemMeta().getDisplayName());
 	}
 	
 	public void ready(Player player)
@@ -328,8 +325,8 @@ public class Battle implements Listener{
 		defender.teleport(loc2);
 		
 		
-		inv.showMenu(challenger);
-		inv.showMenu(defender);	
+		inv.showMenu(challenger, 1);
+		inv.showMenu(defender, 1);	
 		
 	}
 	
@@ -553,62 +550,34 @@ public class Battle implements Listener{
 	    
 	    //empty line
 	    Score s1 = o.getScore("");
-	    s1.setScore(3);
+	    s1.setScore(4);
 	    
 	    //set player + chosen kit
-	    String kit = this.kits.get(player);
-	    if(kit==null)
-	    {
-	    	kit = "null";
-	    }
 	    String kitname = "NULL";
-	    switch(kit)
+	    String kit = this.kits.get(player);
+	    if(kit!=null)
 	    {
-	    case "potion":
-	    	kitname = inv.potionName;
-	    	break;
-	    case "gapple":
-	    	kitname = inv.gappleName;
-	    	break;
-	    case "mcsg":
-	    	kitname = inv.mcsgName;
-	    	break;
-    	default:
-    		kitname = "Choosing...";
-    		break;
+	    	kitname = kit;
 	    }
 	    Score s2 = o.getScore(player.getName() + "§6: " + kitname);
-	    s2.setScore(2);
+	    s2.setScore(3);
 	    
 	    //get the kit from the opponent next.
 	    Player opponent = this.duels.get(player);	    
-	    String kit2 = this.kits.get(opponent);
-	    if(kit2==null)
-	    {
-	    	kit2 = "null";
-	    }
 	    String kitname2 = "NULL";
-	    switch(kit2)
+	    String kit2 = this.kits.get(opponent);
+	    if(kit2!=null)
 	    {
-	    case "potion":
-	    	kitname2 = inv.potionName;
-	    	break;
-	    case "gapple":
-	    	kitname2 = inv.gappleName;
-	    	break;
-	    case "mcsg":
-	    	kitname2 = inv.mcsgName;
-	    	break;
-    	default:
-    		kitname = "Choosing...";
-    		break;
+	    	kitname2 = kit2;
 	    }
 	    Score s3 = o.getScore(opponent.getName() + "§6: " + kitname2);
-	    s3.setScore(1);
+	    s3.setScore(2);	  
 	    
+	    Score s4 = o.getScore(" ");
+	    s4.setScore(1);
 	   
-		    Score s4 = o.getScore(this.bottomscoreboard);
-		    s4.setScore(0);
+	    Score s5 = o.getScore(this.bottomscoreboard);
+	    s5.setScore(0);
 	   
 	    
 	    

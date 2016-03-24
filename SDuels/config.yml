@@ -8,6 +8,7 @@ helpmessage:
   - "&cPut your help-message here."
   - "&cuse a - for each new line."
 
+
 #textchat messages
 
 #nopermissions message
@@ -55,30 +56,66 @@ lossmessage: "&6You Lost!"
 
 
 
-
-#GUI texts
+#GUI & kits
 menuname: "&9Kit Menu"
 
-potionname: "&6Potion PvP"
-potionlore:
-  - "&7POTION- Put your lore here"
-  - "TEST"
-  - "&cUse Empty lines for an empty space in the lore."
-  
-gapplename: "&6Gapple PvP"
-gapplelore:
-  - "&7GAPPLE- Put your lore here"
-  - ""
-  - "&cUse Empty lines for an empty space in the lore."
-  
-mcsgname: "&6MCSG"
-mcsglore:
-  - "&7MCSG- Put your lore here"
-  - ""
-  - "&cUse Empty lines for an empty space in the lore."
 
 
-#end of messages
+#Use numberic ID's for the items. please keep this format:
+#item: ID:metadata,amount,enchantmentid:level,enchantmentid:level, ......
+#
+#if you do not fill in enchantments, the plugin assumes it will not need any.
+#If you do not need a metadata, you can either remove the :metadata or put down :0.
+#
+#Armor will automatically be equipped. If a second armor set is added, it will go in the inventory.
+kits:
+   kit1:
+      name: "&6Potion PvP"
+      lore:
+           - "&7POTION- Put your lore here"
+           - ""
+           - "&cUse Empty lines for an empty space in the lore."
+      menuitem: 373:8197
+      items:
+           - 310,1,0:1
+           - 311,1,0:1
+           - 312,1,0:1
+           - 313,1,0:1
+           - 276,1,16:1
+           - 373:16421,32
+           - 393:0,32
+   gapplekit:
+      name: "&6Gapple PvP"
+      lore:
+           - "&7POTION- Put your lore here"
+           - ""
+           - "&cUse Empty lines for an empty space in the lore."
+      menuitem: 394
+      items:
+           - 310,1,0:1,1:2
+           - 311,1,0:1,1:3
+           - 312,1,0:1,1:5
+           - 313,1,0:1,1:100
+           - 276,1,16:1,17:4
+           - 373:16421,32
+           - 393:0,32
+   mcsg:
+      name: "&6MCSG"
+      lore:
+           - "&7POTION- Put your lore here"
+           - ""
+           - "&cUse Empty lines for an empty space in the lore."
+      menuitem: 1
+      items:
+           - 310,1
+           - 311,1,
+           - 312,1
+           - 313,1,0:1,1:100
+           - 276,1,16:1,17:4
+           - 373:16421,32
+           - 393:0,32
+           
+
 
 #location to teleport both players to after battle
 afterbattlelocation: x,y,z,yaw,pitch,world

@@ -26,8 +26,7 @@ public class Inventories{
 	String menuname = "§9Kit Menu";
 	String playernull = "§cThis player does not appear in our database!";
 	
-	String potionName = "§6Potion PvP", gappleName = "§6Gapple PvP", mcsgName = "§6MCSG";
-	ArrayList<String> potionlore = new ArrayList<String>(), gapplelore = new ArrayList<String>(), mcsglore = new ArrayList<String>();
+	
 	
 	@SuppressWarnings("unchecked")
 	public void getStrings(YamlConfiguration yml)
@@ -38,49 +37,6 @@ public class Inventories{
 			this.menuname = temp.replace("&", "§");
 		}
 		
-		temp = yml.getString("potionname");
-		if(temp!=null)
-		{
-			this.potionName = temp.replace("&", "§");
-		}
-		
-		;
-		if(yml.getList("potionlore")!=null)
-		{
-			for(String string: (List<String>) yml.getList("potionlore"))
-			{			
-				this.potionlore.add(string.replace("&", "§"));
-			}
-		}
-		
-		temp = yml.getString("gapplename");
-		if(temp!=null)
-		{
-			this.gappleName = temp.replace("&", "§");
-		}
-		
-		if(yml.getList("gapplelore")!=null)
-		{
-			for(String string: (List<String>) yml.getList("gapplelore"))
-			{
-				this.gapplelore.add(string.replace("&", "§"));
-			}
-		}
-		
-		temp = yml.getString("mcsgname");
-		if(temp!=null)
-		{
-			this.mcsgName = temp.replace("&", "§");
-		}
-		
-		if(yml.getList("mcsglore")!=null)
-		{
-			for(String string: (List<String>) yml.getList("mcsglore"))
-			{
-				this.mcsglore.add(string.replace("&", "§"));
-			}
-		}
-		
 		temp = yml.getString("playernonexsistant");
 		if(temp!=null)
 		{
@@ -89,40 +45,64 @@ public class Inventories{
 		
 	}
 	
-	public void showMenu(Player player)
+	public void showMenu(Player player, int page)
 	{
-		Inventory menu = Bukkit.createInventory(null, 9, menuname);
+		int start = page*45 - 45;//starts at 0
+		if(Kits.kits.isEmpty())
+		{
+			System.out.println("There are no kits specified! cannot open inventory!");
+			return;
+		}
+		if(start > Kits.kits.size()-1)
+		{
+			start = 0;
+		}
+		Inventory menu = Bukkit.createInventory(null, 54, menuname);
 
-		Potion pot = new Potion(PotionType.INSTANT_HEAL);
-		ItemStack potion = pot.toItemStack(1);
+		if(page>1)
 		{
-			ItemMeta meta = potion.getItemMeta();
-			meta.setDisplayName(this.potionName);
-			ArrayList<String> list = this.potionlore;			
-			meta.setLore(list);
-			potion.setItemMeta(meta);
-			menu.setItem(2, potion);
+			//they are definately not on page 1, so we add a page back arrow.
+			int prevpage = page-1;
+			ItemStack back = new ItemStack(Material.ARROW, prevpage);
+			{
+				ItemMeta meta = back.getItemMeta();
+				meta.setDisplayName("Page " + prevpage);
+				back.setItemMeta(meta);
+				menu.setItem(45, back);
+			}
+		}
+		if(start+44 < Kits.kits.size())
+		{
+			//There are more pages to be discovered, lets give them a next page arrow
+			int nextpage = page-1;
+			ItemStack next = new ItemStack(Material.ARROW, nextpage);
+			{
+				ItemMeta meta = next.getItemMeta();
+				meta.setDisplayName("Page " + nextpage);
+				next.setItemMeta(meta);
+				menu.setItem(53, next);
+			}
 		}
 		
-		ItemStack gapple = new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1);
-		{
-			ItemMeta meta = gapple.getItemMeta();
-			meta.setDisplayName(this.gappleName);
-			ArrayList<String> list = this.gapplelore;			
-			meta.setLore(list);
-			gapple.setItemMeta(meta);
-			menu.setItem(4, gapple);
+		int currentslot = 0;
+		int i = 0;
+		for(String string: Kits.kits.keySet())
+		{	
+			if(i<start)
+			{
+				i++;
+				continue;
+			}
+			if(currentslot > 44)
+			{
+				break;
+			}
+			Kit kit = Kits.kits.get(string);
+			ItemStack item = kit.menuitem;
+			menu.setItem(currentslot, item);
+			i++;
 		}
 		
-		ItemStack mcsg = new ItemStack(Material.FISHING_ROD, 1);
-		{
-			ItemMeta meta = mcsg.getItemMeta();
-			meta.setDisplayName(this.mcsgName);
-			ArrayList<String> list = this.mcsglore;			
-			meta.setLore(list);
-			mcsg.setItemMeta(meta);
-			menu.setItem(6, mcsg);
-		}
 		player.openInventory(menu);
 	}
 
