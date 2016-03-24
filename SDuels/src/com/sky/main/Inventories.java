@@ -1,7 +1,6 @@
 package com.sky.main;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -11,8 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionType;
 
 public class Inventories{
 
@@ -28,7 +25,6 @@ public class Inventories{
 	
 	
 	
-	@SuppressWarnings("unchecked")
 	public void getStrings(YamlConfiguration yml)
 	{
 		String temp = yml.getString("menuname");
@@ -106,7 +102,7 @@ public class Inventories{
 		player.openInventory(menu);
 	}
 
-	public void showStats(Player sender, OfflinePlayer player)
+	public void showStats(Player sender, OfflinePlayer player, int page)
 	{
 		PlayerData PD = Main.getPlayerData(player);
 		if(!PD.exists)
@@ -114,14 +110,14 @@ public class Inventories{
 			sender.sendMessage(this.playernull);
 			return;
 		}
-		Inventory menu = Bukkit.createInventory(null, 27, menuname);
+		Inventory menu = Bukkit.createInventory(null, 54, menuname);
 
 		ItemStack wins = new ItemStack(Material.GOLD_BLOCK, 1);
 		{
 			ItemMeta meta = wins.getItemMeta();
 			meta.setDisplayName("§6Wins: " + PD.wins);
 			wins.setItemMeta(meta);
-			menu.setItem(0, wins);
+			menu.setItem(48, wins);
 		}
 		
 		ItemStack losses = new ItemStack(Material.COAL_BLOCK, 1);
@@ -129,90 +125,73 @@ public class Inventories{
 			ItemMeta meta = losses.getItemMeta();
 			meta.setDisplayName("§8Losses: " + PD.losses);
 			losses.setItemMeta(meta);
-			menu.setItem(9, losses);
+			menu.setItem(50, losses);
 		}
 		
-		Potion pot = new Potion(PotionType.INSTANT_HEAL);
-		ItemStack potionStat = pot.toItemStack(1);
+		int start = page*45 - 45;//starts at 0
+		if(page>1)
 		{
-			ItemMeta meta = potionStat.getItemMeta();
-			meta.setDisplayName("§6Stats for kit: " + this.potionName);
-			ArrayList<String> list = new ArrayList<String>();
-			list.add("");
-			list.add("§7Kit Uses: " + (PD.kitLossPotion + PD.kitWinPotion));
-			list.add("§6Kit Wins: " + PD.kitWinPotion);
-			list.add("§7Kit Losses: " + PD.kitLossPotion);
-			list.add("");
-			if(PD.kitLossPotion!=0)
+			//they are definately not on page 1, so we add a page back arrow.
+			int prevpage = page-1;
+			ItemStack back = new ItemStack(Material.ARROW, prevpage);
 			{
-				list.add("§7Win percentage: " + (PD.kitWinPotion/PD.kitLossPotion)*100 + "%");
+				ItemMeta meta = back.getItemMeta();
+				meta.setDisplayName("Page " + prevpage);
+				back.setItemMeta(meta);
+				menu.setItem(45, back);
 			}
-			else if(PD.kitWinPotion!=0)
-			{
-				list.add("§7Win percentage: " + "100%");
-			}
-			else
-			{
-				list.add("§7Win percentage: " + "N/A");				
-			}
-			meta.setLore(list);
-			potionStat.setItemMeta(meta);
-			menu.setItem(20, potionStat);
-		}		
-		
-		ItemStack gappleStat = new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1);
+		}
+		if(start+44 < Kits.kits.size())
 		{
-			ItemMeta meta = gappleStat.getItemMeta();
-			meta.setDisplayName("§6Stats for kit: " + this.gappleName);
-			ArrayList<String> list = new ArrayList<String>();
-			list.add("");
-			list.add("§7Kit Uses: " + (PD.kitLossGapple + PD.kitWinGapple));
-			list.add("§6Kit Wins: " + PD.kitWinGapple);
-			list.add("§7Kit Losses: " + PD.kitLossGapple);
-			list.add("");
-			if(PD.kitLossGapple!=0)
+			//There are more pages to be discovered, lets give them a next page arrow
+			int nextpage = page-1;
+			ItemStack next = new ItemStack(Material.ARROW, nextpage);
 			{
-				list.add("§7Win percentage: " + (PD.kitWinGapple/PD.kitLossGapple)*100 + "%");
+				ItemMeta meta = next.getItemMeta();
+				meta.setDisplayName("Page " + nextpage);
+				next.setItemMeta(meta);
+				menu.setItem(53, next);
 			}
-			else if(PD.kitWinGapple!=0)
-			{
-				list.add("§7Win percentage: " + "100%");
-			}
-			else
-			{
-				list.add("§7Win percentage: " + "N/A");				
-			}
-			meta.setLore(list);
-			gappleStat.setItemMeta(meta);
-			menu.setItem(22, gappleStat);
 		}
 		
-		ItemStack mcsgStat = new ItemStack(Material.FISHING_ROD, 1);
-		{
-			ItemMeta meta = mcsgStat.getItemMeta();
-			meta.setDisplayName("§6Stats for kit: " + this.mcsgName);
-			ArrayList<String> list = new ArrayList<String>();
-			list.add("");
-			list.add("§7Kit Uses: " + (PD.kitLossMCSG + PD.kitWinMCSG));
-			list.add("§6Kit Wins: " + PD.kitWinMCSG);
-			list.add("§7Kit Losses: " + PD.kitLossMCSG);
-			list.add("");
-			if(PD.kitLossMCSG!=0)
+		int currentslot = 0;
+		int i = 0;
+		for(String string: Kits.kits.keySet())
+		{	
+			if(i<start)
 			{
-				list.add("§7Win percentage: " + (PD.kitWinMCSG/PD.kitLossMCSG)*100 + "%");
+				i++;
+				continue;
 			}
-			else if(PD.kitWinMCSG!=0)
+			if(currentslot > 44)
 			{
-				list.add("§7Win percentage: " + "100%");
+				break;
 			}
-			else
+			Kit kit = Kits.kits.get(string);
+			ItemStack item = kit.menuitem;
+			ArrayList<String> lore = new ArrayList<String>();
+			lore.add(" ");
+			lore.add("§6Kit wins: " + PD.kitwins.get(string));
+			lore.add("§7Kit losses: " + PD.kitloss.get(string));
+			lore.add("§7Total kit uses: " + (PD.kitloss.get(string) + PD.kitwins.get(string)));
+			lore.add("");
+			if(PD.kitloss.get(string)==0)
 			{
-				list.add("§7Win percentage: " + "N/A");				
+				if(PD.kitwins.get(string)!=0)
+				{
+					lore.add("Win percentage: 100%");
+				}
+				else
+				{
+					lore.add("Win percentage: N/A");
+				}
 			}
-			meta.setLore(list);
-			mcsgStat.setItemMeta(meta);
-			menu.setItem(24, mcsgStat);
+			lore.add("Win percentage: " + (PD.kitwins.get(string) / PD.kitloss.get(string) * 100) + "%");
+			menu.setItem(currentslot, item);
+			i++;
 		}
+		
+		
 		
 		sender.openInventory(menu);
 	}

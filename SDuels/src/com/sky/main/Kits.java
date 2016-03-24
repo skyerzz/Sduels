@@ -20,6 +20,10 @@ public class Kits {
 	public void loadKits(YamlConfiguration yml)
 	{
 		ConfigurationSection cs = yml.getConfigurationSection("kits");
+		if(cs==null)
+		{
+			return;
+		}
 		for(String string: cs.getKeys(false))
 		{
 			String name = yml.getString(string + ".name");

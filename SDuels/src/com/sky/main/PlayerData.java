@@ -12,12 +12,13 @@ public class PlayerData
 	public final String path;
 
 	public int wins = 0, losses = 0;
-	public int kitLossPotion = 0, kitLossGapple = 0, kitLossMCSG = 0;
-	public int kitWinPotion = 0, kitWinGapple = 0, kitWinMCSG = 0;
 	public boolean exists = false;
 
 	public HashMap<String, Integer> previousDuels = new HashMap<String, Integer>();
 	public HashMap<String, Integer> previousDuelWins = new HashMap<String, Integer>();
+	
+	public HashMap<String, Integer> kitwins = new HashMap<String, Integer>();
+	public HashMap<String, Integer> kitloss = new HashMap<String, Integer>();
 	
 	private YamlConfiguration yml, newyml = new YamlConfiguration();
 	
@@ -101,47 +102,29 @@ public class PlayerData
 			this.losses = this.yml.getInt("losses");
 		}
 		
-		temp = this.yml.getString("kitwins.potion");
-		if(temp != null)
+
+		ConfigurationSection cs = yml.getConfigurationSection("kitstats");
+		if(cs==null)
 		{
-			this.kitWinPotion = this.yml.getInt("kitwins.potion");
+			return;
 		}
 		
-		temp = this.yml.getString("kitwins.gapple");
-		if(temp != null)
+		for(String string: cs.getKeys(false))
 		{
-			this.kitWinGapple = this.yml.getInt("kitwins.gapple");
+			temp = yml.getString("kitstats." + string + ".loss");
+			if(temp!=null)
+			{
+				this.kitloss.put(string, yml.getInt("kitstats." + string + ".loss"));
+			}
+			
+			temp = yml.getString("kitstats." + string + ".wins");
+			if(temp!=null)
+			{
+				this.kitwins.put(string, yml.getInt("kitstats." + string + ".wins"));
+			}
 		}
 		
-		temp = this.yml.getString("kitwins.mcsg");
-		if(temp != null)
-		{
-			this.kitWinMCSG = this.yml.getInt("kitwins.mcsg");
-		}
 		
-		temp = this.yml.getString("kitloss.potion");
-		if(temp != null)
-		{
-			this.kitLossPotion = this.yml.getInt("kitloss.potion");
-		}
-		
-		temp = this.yml.getString("kitloss.gapple");
-		if(temp != null)
-		{
-			this.kitLossGapple = this.yml.getInt("kitloss.gapple");
-		}
-		
-		temp = this.yml.getString("kitloss.mcsg");
-		if(temp != null)
-		{
-			this.kitLossMCSG = this.yml.getInt("kitwloss.mcsg");
-		}
-		
-		temp = this.yml.getString("exists");
-		if(temp!=null)
-		{
-			this.exists = true;
-		}
 
 	}
 
@@ -151,12 +134,15 @@ public class PlayerData
 		this.newyml.set("losses", this.losses);
 		this.newyml.set("exists", true);
 		
-		this.newyml.set("kitwins.potion", this.kitWinPotion);
-		this.newyml.set("kitwins.gapple", this.kitWinGapple);
-		this.newyml.set("kitwins.mcsg", this.kitWinMCSG);
-		this.newyml.set("kitloss.potion", this.kitLossPotion);
-		this.newyml.set("kitloss.gapple", this.kitLossGapple);
-		this.newyml.set("kitloss.mcsg", this.kitLossMCSG);
+		for(String string: kitloss.keySet())
+		{
+			this.newyml.set("kitstats." + string + "loss", kitloss.get(string));
+		}
+		
+		for(String string: kitwins.keySet())
+		{
+			this.newyml.set("kitstats." + string + "wins", kitwins.get(string));
+		}
 	}
 	
 	public void save()

@@ -300,14 +300,32 @@ public class Main extends JavaPlugin implements Listener{
 					  sendHelpMessage(player);
 					  return true;
 				  }
+
+				  int page = 1;
+				  if(args.length < 3)
+				  {
+					  try
+					  {
+						  page = Integer.parseInt(args[2]);
+						  if(page < 1)
+						  {
+							  page = 1;
+						  }
+					  }
+					  catch(NumberFormatException e)
+					  {
+						  //well, page 1 it is then.
+					  }
+				  }
+				  
 				  @SuppressWarnings("deprecation")
-				OfflinePlayer objective = Bukkit.getOfflinePlayer(args[1]);
+				  OfflinePlayer objective = Bukkit.getOfflinePlayer(args[1]);
 				  if(objective==null)
 				  {
 					  player.sendMessage("§6Could not find that player in our system!");
 					  return true;
 				  }
-				  this.battle.inv.showStats(player, objective);
+				  this.battle.inv.showStats(player, objective, page);
 				  return true;
 			  }			  
 			  else if(args[0].equalsIgnoreCase("accept"))

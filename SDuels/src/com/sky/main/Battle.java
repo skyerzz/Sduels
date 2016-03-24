@@ -450,19 +450,14 @@ public class Battle implements Listener{
 		//give the winner some stats
 		PlayerData pPD = Main.getPlayerData(player);
 		pPD.wins++;
-		switch(kits.get(player))
+		String kit = kits.get(player);
+		if(pPD.kitwins.containsKey(kit))
 		{
-		case "potion":
-			pPD.kitWinPotion++;
-			break;
-		case "gapple":
-			pPD.kitWinGapple++;
-			break;
-		case "mcsg":
-			pPD.kitWinMCSG++;
-			break;
-		default: 
-			break;
+			pPD.kitwins.replace(kit, pPD.kitwins.get(kit));
+		}
+		else
+		{
+			pPD.kitwins.put(kit, 1);
 		}
 		pPD.addPreviousDuel(loser.getUniqueId().toString(), 1);
 		pPD.addPreviousDuelWin(loser.getUniqueId().toString(), 1);
@@ -474,18 +469,14 @@ public class Battle implements Listener{
 		//give the loser some stats
 		PlayerData lPD = Main.getPlayerData(loser);
 		lPD.losses++;
-		switch(kits.get(player))
+		kit = kits.get(loser);
+		if(lPD.kitloss.containsKey(kit))
 		{
-		case "potion":
-			lPD.kitLossPotion++;
-			break;
-		case "gapple":
-			lPD.kitLossGapple++;
-			break;
-		case "mcsg":
-			lPD.kitLossMCSG++;
-			break;
-		default: break;
+			lPD.kitloss.replace(kit, lPD.kitloss.get(kit));
+		}
+		else
+		{
+			lPD.kitloss.put(kit, 1);
 		}
 		lPD.addPreviousDuel(player.getUniqueId().toString(), 1);
 		if(!loser.isOnline())
