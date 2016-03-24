@@ -45,6 +45,8 @@ public class Main extends JavaPlugin implements Listener{
 	public String[] helpmessage;
 	public static String maindatafolder;
 	
+	//TODO: make confirmation message of sending duel
+	
 	@Override
 	public void onEnable() 
 	{

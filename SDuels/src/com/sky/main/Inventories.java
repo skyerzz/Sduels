@@ -70,7 +70,7 @@ public class Inventories{
 		if(start+44 < Kits.kits.size())
 		{
 			//There are more pages to be discovered, lets give them a next page arrow
-			int nextpage = page-1;
+			int nextpage = page+1;
 			ItemStack next = new ItemStack(Material.ARROW, nextpage);
 			{
 				ItemMeta meta = next.getItemMeta();
@@ -145,7 +145,7 @@ public class Inventories{
 		if(start+44 < Kits.kits.size())
 		{
 			//There are more pages to be discovered, lets give them a next page arrow
-			int nextpage = page-1;
+			int nextpage = page+1;
 			ItemStack next = new ItemStack(Material.ARROW, nextpage);
 			{
 				ItemMeta meta = next.getItemMeta();
@@ -171,14 +171,23 @@ public class Inventories{
 			Kit kit = Kits.kits.get(string);
 			ItemStack item = kit.menuitem;
 			ArrayList<String> lore = new ArrayList<String>();
-			lore.add(" ");
-			lore.add("§6Kit wins: " + PD.kitwins.get(string));
-			lore.add("§7Kit losses: " + PD.kitloss.get(string));
-			lore.add("§7Total kit uses: " + (PD.kitloss.get(string) + PD.kitwins.get(string)));
-			lore.add("");
-			if(PD.kitloss.get(string)==0)
+			int w = 0, l = 0;
+			if(PD.kitwins.containsKey(string))
 			{
-				if(PD.kitwins.get(string)!=0)
+				w = PD.kitwins.get(string);
+			}
+			if(PD.kitloss.containsKey(string))
+			{
+				l = PD.kitloss.get(string);
+			}
+			lore.add(" ");
+			lore.add("§6Kit wins: " + w);
+			lore.add("§7Kit losses: " + l);
+			lore.add("§7Total kit uses: " + (l + w));
+			lore.add("");
+			if(l==0)
+			{
+				if(w!=0)
 				{
 					lore.add("Win percentage: 100%");
 				}
@@ -187,9 +196,17 @@ public class Inventories{
 					lore.add("Win percentage: N/A");
 				}
 			}
-			lore.add("Win percentage: " + (PD.kitwins.get(string) / PD.kitloss.get(string) * 100) + "%");
+			else
+			{
+				lore.add("Win percentage: " + (w / l * 100) + "%");
+			}
+			ItemMeta meta = item.getItemMeta();
+			meta.setLore(lore);
+			item.setItemMeta(meta);
+			
 			menu.setItem(currentslot, item);
 			i++;
+			currentslot++;
 		}
 		
 		

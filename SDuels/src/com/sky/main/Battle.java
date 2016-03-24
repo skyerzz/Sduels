@@ -215,9 +215,12 @@ public class Battle implements Listener{
 				   @Override
 				   public void run() 
 				   {
-					   inv.showMenu(player, 1);
+					   if(player.getOpenInventory() == null)
+					   {
+						   inv.showMenu(player, 1);
+					   }
 				   }
-			}, 1L);
+			}, 5L);
 		}
 	}
 	
@@ -229,8 +232,36 @@ public class Battle implements Listener{
 			return;
 		}
 		Player player = (Player) event.getWhoClicked();
+		if(event.getClickedInventory()==null)
+		{
+			return;
+		}
+		if(event.getClickedInventory().getName()==null)
+		{
+			return;
+		}
+		if(!event.getClickedInventory().getName().toLowerCase().contains("kit menu"))
+		{
+			return;
+		}
+		event.setCancelled(true);
 		if(!this.choosing.contains(player))
 		{
+			if(event.getSlot() == 45 || event.getSlot() == 53)
+			{
+				String name = event.getCurrentItem().getItemMeta().getDisplayName().toLowerCase();
+				name = name.replace("page ", "").trim();
+				int newpage = 1;
+				try
+				{
+					newpage = Integer.parseInt(name);
+				}
+				catch(NumberFormatException e)
+				{
+				}
+				this.inv.showMenu(player, newpage);
+				return;
+			}
 			return;
 		}
 		if(event.getCurrentItem()==null)
@@ -246,7 +277,6 @@ public class Battle implements Listener{
 		{
 			return;
 		}
-		event.setCancelled(true);
 		
 		//check if they clicked on a page, or a kit
 		if(event.getSlot() == 45 || event.getSlot() == 53)
@@ -260,7 +290,6 @@ public class Battle implements Listener{
 			}
 			catch(NumberFormatException e)
 			{
-				
 			}
 			this.inv.showMenu(player, newpage);
 			return;
@@ -402,9 +431,6 @@ public class Battle implements Listener{
 		this.oldArmor.remove(loser);
 		
 		
-		//little message
-		loser.sendMessage(this.lossmessage);
-		player.sendMessage(this.winmessage);
 		
 		//remove effects from both players
 		for(PotionEffect effect: player.getActivePotionEffects())
@@ -452,6 +478,11 @@ public class Battle implements Listener{
 			loser.teleport(this.endbattle);
 			return;
 		}
+
+		//little message
+
+		loser.sendMessage(this.lossmessage);
+		player.sendMessage(this.winmessage);
 		
 		//give the winner some stats
 		PlayerData pPD = Main.getPlayerData(player);

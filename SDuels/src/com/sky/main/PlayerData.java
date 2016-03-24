@@ -102,6 +102,12 @@ public class PlayerData
 			this.losses = this.yml.getInt("losses");
 		}
 		
+		temp = this.yml.getString("exists");
+		if(temp != null)
+		{
+			this.exists = true;
+		}
+		
 
 		ConfigurationSection cs = yml.getConfigurationSection("kitstats");
 		if(cs==null)
