@@ -212,6 +212,14 @@ public class Battle implements Listener{
 		if(this.choosing.contains(player))
 		{
 			System.out.println("INVCLOSE");
+			Bukkit.getScheduler().runTaskLaterAsynchronously(this.main, new Runnable()
+			{
+				   @Override
+				   public void run() 
+				   {
+					   inv.showMenu(player);
+				   }
+			}, 1L);
 			inv.showMenu(player);
 		}
 	}

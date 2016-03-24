@@ -14,7 +14,7 @@ helpmessage:
 nopermissionmessage: "§cYou do not have permissions for this!"
 
 #what a player sees if they get invited to duel
-duelinvitemessage: "&e<player> Has challenged you to a duel. Click to accept!"
+duelinvitemessage: "&e<player> has challenged you to a duel. Click to accept!"
 duelinvitehover: "&eClick to accept the duel!"
 
 #if the duel gets cancelled, this message will be send to both players
