@@ -211,7 +211,6 @@ public class Battle implements Listener{
 		Player player = (Player) event.getPlayer();
 		if(this.choosing.contains(player))
 		{
-			System.out.println("INVCLOSE");
 			Bukkit.getScheduler().runTaskLaterAsynchronously(this.main, new Runnable()
 			{
 				   @Override
@@ -269,24 +268,8 @@ public class Battle implements Listener{
 	
 	public void ready(Player player)
 	{
-		if(duels==null)
-		{
-			System.out.println("duels=null");
-		}
 		Player opponent = this.duels.get(player);
-		if(opponent==null)
-		{
-			System.out.println("opponent null in ready");
-		}
-		if(this.readyMessage == null)
-		{
-			System.out.println("readymessage null");
-		}
 		opponent.sendMessage(this.readyMessage);
-		if(choosing==null)
-		{
-			System.out.println("Choosing=null");
-		}
 		this.choosing.remove(player);
 		if(!this.choosing.contains(opponent))
 		{
@@ -435,7 +418,6 @@ public class Battle implements Listener{
 		{
 			//they were not ingame yet, which means the countdown hasnt started. if someone won now
 			//its likely to be by a leave of the other player. Therefore we cancel the duel.
-			System.out.println("Cancelled battle");
 			player.sendMessage(this.cancelled);
 			loser.sendMessage(this.cancelled);
 			this.duels.remove(player);
@@ -554,7 +536,6 @@ public class Battle implements Listener{
 		Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
 		if(board==null)
 		{
-			System.out.println("BoardNull");
 			return;
 		}
 		if(scoreboardName==null)
