@@ -80,6 +80,14 @@ public class Inventories{
 			}
 		}
 		
+		ItemStack giveup = new ItemStack(Material.REDSTONE_BLOCK, 1);
+		{
+			ItemMeta meta = giveup.getItemMeta();
+			meta.setDisplayName("§4Give Up");
+			giveup.setItemMeta(meta);
+			menu.setItem(49, giveup);
+		}
+		
 		int currentslot = 0;
 		int i = 0;
 		for(String string: Kits.kits.keySet())

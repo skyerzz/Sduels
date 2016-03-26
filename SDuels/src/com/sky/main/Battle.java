@@ -205,20 +205,26 @@ public class Battle implements Listener{
 	{
 		if(!(event.getPlayer() instanceof Player))
 		{
+			System.out.println("noplayer-invc");
 			return;
 		}
 		Player player = (Player) event.getPlayer();
+		System.out.println("player-invc");
 		if(this.choosing.contains(player))
 		{
+			System.out.println("inchoosing-invc");
 			Bukkit.getScheduler().runTaskLaterAsynchronously(this.main, new Runnable()
 			{
 				   @Override
 				   public void run() 
 				   {
+						System.out.println("running-invc");
 					   if(player.getOpenInventory() == null)
 					   {
+							System.out.println("showmenu-invc");
 						   inv.showMenu(player, 1);
 					   }
+						System.out.println("endrun-invc");
 				   }
 			}, 5L);
 		}
@@ -292,6 +298,11 @@ public class Battle implements Listener{
 			{
 			}
 			this.inv.showMenu(player, newpage);
+			return;
+		}
+		else if(event.getSlot() == 49)
+		{
+			this.giveUp(player, this.cancelled);
 			return;
 		}
 		
@@ -447,35 +458,7 @@ public class Battle implements Listener{
 		{
 			//they were not ingame yet, which means the countdown hasnt started. if someone won now
 			//its likely to be by a leave of the other player. Therefore we cancel the duel.
-			player.sendMessage(this.cancelled);
-			loser.sendMessage(this.cancelled);
-			this.duels.remove(player);
-			this.duels.remove(loser);
-			this.kits.remove(player);
-			this.kits.remove(loser);
-			this.choosing.remove(player);
-			this.choosing.remove(loser);
-			this.ingame.remove(player);
-			this.ingame.remove(loser);
-			this.freeze.remove(loser);
-			this.freeze.remove(player);
-			player.closeInventory();
-			loser.closeInventory();
-			
-			//free the arena again
-			Location loc = this.arena.get(player);
-			if(loc==null)
-			{
-				loc = this.arena.get(loser);
-			}
-			Location loc2 = Main.occupiedArenas.get(loc);
-			Main.arenas.put(loc, loc2);
-			Main.occupiedArenas.remove(loc);
-			this.arena.remove(player);
-			this.arena.remove(loser);
-
-			player.teleport(this.endbattle);
-			loser.teleport(this.endbattle);
+			giveUp(player, this.cancelled);
 			return;
 		}
 
@@ -612,6 +595,41 @@ public class Battle implements Listener{
 		player.setScoreboard(board);
 	}
 	
+	public void giveUp(Player player, String reason)
+	{
+		Player loser = player;
+		player = this.duels.get(player);
+		player.sendMessage(reason);
+		loser.sendMessage(reason);
+		this.duels.remove(player);
+		this.duels.remove(loser);
+		this.kits.remove(player);
+		this.kits.remove(loser);
+		this.choosing.remove(player);
+		this.choosing.remove(loser);
+		this.ingame.remove(player);
+		this.ingame.remove(loser);
+		this.freeze.remove(loser);
+		this.freeze.remove(player);
+		player.closeInventory();
+		loser.closeInventory();
+		
+		//free the arena again
+		Location loc = this.arena.get(player);
+		if(loc==null)
+		{
+			loc = this.arena.get(loser);
+		}
+		Location loc2 = Main.occupiedArenas.get(loc);
+		Main.arenas.put(loc, loc2);
+		Main.occupiedArenas.remove(loc);
+		this.arena.remove(player);
+		this.arena.remove(loser);
+
+		player.teleport(this.endbattle);
+		loser.teleport(this.endbattle);
+		return;
+	}
 	
 	public Location getArena()
 	{
