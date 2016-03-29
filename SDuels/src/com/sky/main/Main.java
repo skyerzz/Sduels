@@ -41,11 +41,11 @@ public class Main extends JavaPlugin implements Listener{
 	public String noperms = "§cYou do not have permissions for this!";
 	public String battleself = "§cYou cannot battle yourself!";
 	public String nochallenge = "§cThis player did not challenge you!";
+	public String duelconfirmation = "§eYou challanged <player> for a duel!";
 	
 	public String[] helpmessage;
 	public static String maindatafolder;
 	
-	//TODO: make confirmation message of sending duel
 	
 	@Override
 	public void onEnable() 
@@ -286,7 +286,7 @@ public class Main extends JavaPlugin implements Listener{
 			  }
 			  else if(args[0].equalsIgnoreCase("version"))
 			  {
-				  player.sendMessage("§6Sduels version " + this.getDescription().getVersion());
+				  player.sendMessage("§6running sDuels version " + this.getDescription().getVersion());
 				  player.sendMessage("§6Author: skyerzz");
 				  return true;
 			  }

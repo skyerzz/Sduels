@@ -48,6 +48,12 @@ public class Battle implements Listener{
 			this.cancelled = temp.replace("&", "§");
 		}
 		
+		temp = yml.getString("noarenas");
+		if(temp!=null)
+		{
+			this.noarena = temp.replace("&", "§");
+		}
+		
 		temp = yml.getString("startbattle");
 		if(temp!=null)
 		{
@@ -116,7 +122,8 @@ public class Battle implements Listener{
 		}
 	}
 	
-	public String cancelled = "§cNo available arenas, Duel is cancelled!";
+	public String cancelled = "§cYour opponent gave up, Duel is cancelled!";
+	public String noarena = "§cNo available arenas, Duel is cancelled!";
 	public String startbattle = "§6GO!";
 	public String countdownmessage = "§6The match begins in <seconds> seconds!";
 	public String readyMessage = "§6Your opponent is ready!";
@@ -205,26 +212,21 @@ public class Battle implements Listener{
 	{
 		if(!(event.getPlayer() instanceof Player))
 		{
-			System.out.println("noplayer-invc");
 			return;
 		}
 		Player player = (Player) event.getPlayer();
-		System.out.println("player-invc");
 		if(this.choosing.contains(player))
 		{
-			System.out.println("inchoosing-invc");
 			Bukkit.getScheduler().runTaskLaterAsynchronously(this.main, new Runnable()
 			{
 				   @Override
 				   public void run() 
 				   {
-						System.out.println("running-invc");
-					   if(player.getOpenInventory() == null)
+					   //player.getOpenInventory somehow doesnt return null, but the normal players inventory if none are opened.
+					   if(player.getOpenInventory().countSlots() == 41)
 					   {
-							System.out.println("showmenu-invc");
 						   inv.showMenu(player, 1);
 					   }
-						System.out.println("endrun-invc");
 				   }
 			}, 5L);
 		}
@@ -340,8 +342,8 @@ public class Battle implements Listener{
 			//no available arenas are found, we cancel the match
 			duels.remove(challenger);
 			duels.remove(defender);
-			challenger.sendMessage(cancelled);
-			defender.sendMessage(cancelled);
+			challenger.sendMessage(noarena);
+			defender.sendMessage(noarena);
 			return;
 		}
 		Location loc2 = Main.arenas.get(loc);
