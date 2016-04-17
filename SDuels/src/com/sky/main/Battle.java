@@ -150,7 +150,7 @@ public class Battle implements Listener{
 	{
 		if(freeze.contains(event.getPlayer()))
 		{
-			event.setTo(event.getFrom());
+			event.setTo(new Location(event.getFrom().getWorld(), event.getFrom().getX(), event.getTo().getY(), event.getFrom().getZ()));
 		}
 	}
 	
